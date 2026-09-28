@@ -1,0 +1,35 @@
+:root {
+  --bg: #f7f8fa;
+  --bg-panel: #ffffff;
+  --bg-panel-raised: #f0f1f4;
+  --line: #e3e5e9;
+  --text-primary: #151823;
+  --text-secondary: #6b7280;
+}
+
+.dark {
+  --bg: #10151b;
+  --bg-panel: #161d25;
+  --bg-panel-raised: #1c242e;
+  --line: #2a333d;
+  --text-primary: #e9e4d8;
+  --text-secondary: #a9a89e;
+}
+
+@theme {
+  --color-bg: var(--bg);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-panel-raised: var(--bg-panel-raised);
+  --color-line: var(--line);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  --color-accent: #9179d6;
+  --color-accent-dim: #5f4f96;
+  --color-sage: #7fa387;
+  --color-brick: #b1594a;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
