@@ -1,66 +1,67 @@
-import { LanguageProvider, useLanguage } from './context/LanguageContext'
-import { ThemeProvider, useTheme } from './context/ThemeContext'
-import { isSupabaseConfigured } from './lib/supabaseClient'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { ProtectedRoute } from './components/auth/ProtectedRoute.jsx'
+import BrandLogo from './components/ui/BrandLogo.jsx'
+import { Button } from './components/ui/Button.jsx'
+import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import { LanguageProvider, useLanguage } from './context/LanguageContext.jsx'
+import { ThemeProvider, useTheme } from './context/ThemeContext.jsx'
+import { AuthPage } from './pages/AuthPage.jsx'
+import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx'
 
-function FoundationDemo() {
+function DashboardPlaceholder() {
+  const { user, signOut } = useAuth()
+  const { t, lang, toggleLanguage } = useLanguage()
   const { theme, toggleTheme } = useTheme()
-  const { lang, toggleLanguage, t } = useLanguage()
-  const supabaseReady = isSupabaseConfigured()
 
   return (
-    <main className="min-h-screen p-8 bg-bg text-text-primary transition-colors duration-200 flex items-center justify-center">
-      <div className="w-full max-w-lg p-6 rounded-xl bg-bg-panel border border-line shadow-sm space-y-6">
-        <header>
-          <div className="inline-block px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-accent/15 text-accent mb-2">
-            M0 Fondasi
-          </div>
-          <h1 className="font-display text-accent text-2xl font-bold tracking-tight">
-            {t('app.name')}
-          </h1>
-          <p className="font-body text-text-secondary text-sm mt-0.5">
-            {t('app.tagline')}
-          </p>
-        </header>
-
-        <section className="space-y-3 pt-2 border-t border-line">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-text-secondary">{t('settings.theme')}</span>
+    <main className="min-h-screen p-6 sm:p-12 bg-bg text-text-primary flex items-center justify-center transition-colors duration-200">
+      <div className="w-full max-w-lg p-6 sm:p-8 rounded-xl bg-bg-panel border border-line shadow-sm space-y-6">
+        <header className="flex items-center justify-between">
+          <BrandLogo />
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={toggleTheme}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-panel-raised border border-line hover:border-accent transition-colors cursor-pointer"
+              className="px-2.5 py-1 rounded-lg text-xs font-medium border border-line bg-bg-panel-raised hover:border-accent transition-colors cursor-pointer"
+              aria-label="Toggle Theme"
             >
-              {theme === 'dark' ? `🌙 ${t('settings.themeDark')}` : `☀️ ${t('settings.themeLight')}`}
+              {theme === 'dark' ? '🌙' : '☀️'}
             </button>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-text-secondary">{t('settings.language')}</span>
             <button
               type="button"
               onClick={toggleLanguage}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-panel-raised border border-line hover:border-accent transition-colors cursor-pointer"
+              className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium border border-line bg-bg-panel-raised hover:border-accent transition-colors cursor-pointer"
+              aria-label="Toggle Language"
             >
-              🌐 {lang.toUpperCase()} — {lang === 'id' ? t('settings.langId') : t('settings.langEn')}
+              {lang.toUpperCase()}
             </button>
           </div>
+        </header>
 
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-text-secondary">Koneksi Supabase</span>
-            <span
-              className={`text-xs px-2.5 py-1 rounded-full font-mono font-medium ${
-                supabaseReady
-                  ? 'bg-sage/15 text-sage border border-sage/30'
-                  : 'bg-brick/15 text-brick border border-brick/30'
-              }`}
-            >
-              {supabaseReady ? 'Env Siap' : 'Env Belum Dikonfigurasi'}
-            </span>
+        <section className="space-y-3 pt-4 border-t border-line">
+          <div className="inline-block px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-sage/15 text-sage border border-sage/30">
+            ✓ Terotentikasi (FR-AUTH OK)
           </div>
+          <h2 className="font-display text-xl font-bold text-text-primary">
+            {user?.email}
+          </h2>
+          <p className="text-xs text-text-secondary font-mono break-all">
+            User ID: {user?.id}
+          </p>
+          <p className="text-xs text-text-secondary pt-2">
+            Autentikasi (M1) berhasil diverifikasi. Halaman Dashboard & navigasi lengkap akan dibangun pada modul berikutnya.
+          </p>
         </section>
 
-        <footer className="pt-3 border-t border-line text-xs text-text-secondary font-mono">
-          Tokens, i18n, ThemeContext, LanguageContext & Supabase Client OK.
+        <footer className="pt-4 border-t border-line flex items-center justify-between">
+          <span className="text-xs text-text-secondary font-mono">Status: Sesi Aktif</span>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={signOut}
+          >
+            {t('nav.logout')}
+          </Button>
         </footer>
       </div>
     </main>
@@ -69,10 +70,32 @@ function FoundationDemo() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <FoundationDemo />
-      </LanguageProvider>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Routes>
+              {/* Rute Publik */}
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+              {/* Rute Terproteksi */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPlaceholder />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Fallback ke root */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   )
+}
 }
