@@ -7,6 +7,7 @@ import { Input } from '../components/ui/Input.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
+import { logDevError } from '../lib/devLog.js'
 import {
   mapAuthError,
   validatePassword,
@@ -63,6 +64,7 @@ export function ResetPasswordPage() {
         navigate('/', { replace: true })
       }, 1500)
     } catch (err) {
+      logDevError('ResetPasswordPage:handleSubmit', err)
       const errorKey = mapAuthError(err)
       setFormError(t(errorKey))
     } finally {

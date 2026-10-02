@@ -7,6 +7,7 @@ import { Input } from '../components/ui/Input.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
+import { logDevError } from '../lib/devLog.js'
 import {
   mapAuthError,
   validateEmail,
@@ -92,6 +93,7 @@ export function AuthPage() {
         setSuccessMessage(t('auth.resetSent'))
       }
     } catch (err) {
+      logDevError('AuthPage:handleSubmit', err)
       const errorKey = mapAuthError(err)
       setFormError(t(errorKey))
     } finally {

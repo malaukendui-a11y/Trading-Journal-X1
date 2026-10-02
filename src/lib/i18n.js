@@ -32,6 +32,11 @@ export const translations = {
       all: 'Semua',
       currencySymbol: '$',
       na: '-',
+      moduleUpcoming: 'Modul ini akan dibangun pada tahapan berikutnya.',
+      balance: 'Saldo',
+      notFoundTitle: 'Halaman Tidak Ditemukan',
+      notFoundDesc: 'Halaman yang Anda tuju tidak tersedia.',
+      backToHome: 'Kembali ke Dashboard',
     },
     nav: {
       dashboard: 'Dashboard',
@@ -41,6 +46,9 @@ export const translations = {
       analytics: 'Analytics',
       logout: 'Keluar',
       menu: 'Menu',
+      openMenu: 'Buka menu navigasi',
+      closeMenu: 'Tutup menu navigasi',
+      userProfile: 'Profil Pengguna',
     },
     auth: {
       tagline: 'Personal Trading Discipline Dashboard',
@@ -243,6 +251,11 @@ export const translations = {
       all: 'All',
       currencySymbol: '$',
       na: '-',
+      moduleUpcoming: 'This module will be built in the next development phase.',
+      balance: 'Balance',
+      notFoundTitle: 'Page Not Found',
+      notFoundDesc: 'The page you are looking for does not exist.',
+      backToHome: 'Back to Dashboard',
     },
     nav: {
       dashboard: 'Dashboard',
@@ -252,6 +265,9 @@ export const translations = {
       analytics: 'Analytics',
       logout: 'Sign Out',
       menu: 'Menu',
+      openMenu: 'Open navigation menu',
+      closeMenu: 'Close navigation menu',
+      userProfile: 'User Profile',
     },
     auth: {
       tagline: 'Personal Trading Discipline Dashboard',
