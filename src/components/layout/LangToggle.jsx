@@ -17,3 +17,4 @@ export function LangToggle({ lang, onToggle, className = '' }) {
     </button>
   )
 }
+

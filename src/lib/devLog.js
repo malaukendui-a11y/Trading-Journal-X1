@@ -17,3 +17,4 @@ export function logDevError(scope, error) {
     console.error(`[Trading Compass DEV] [${scope}]`, errorDetails)
   }
 }
+

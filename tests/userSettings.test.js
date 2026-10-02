@@ -56,3 +56,4 @@ describe('M2: User Settings Validation Helpers', () => {
     expect(payload.display_name).toBe('Trader')
   })
 })
+

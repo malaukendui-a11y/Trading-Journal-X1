@@ -26,3 +26,4 @@ export function CalendarPage() {
     </div>
   )
 }
+

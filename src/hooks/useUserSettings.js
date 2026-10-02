@@ -179,3 +179,4 @@ export function useUserSettings() {
     displayName: settings.display_name || user?.email?.split('@')[0] || 'Trader',
   }
 }
+
