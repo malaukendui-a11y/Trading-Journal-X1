@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { useUserSettings } from '../../hooks/useUserSettings.js'
+import { ErrorBoundary } from '../ErrorBoundary.jsx'
 import { SidebarNav } from './SidebarNav.jsx'
 import { TopBar } from './TopBar.jsx'
 
@@ -37,7 +38,9 @@ export function AppShell({ children }) {
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
-          {children || <Outlet />}
+          <ErrorBoundary>
+            {children || <Outlet />}
+          </ErrorBoundary>
         </main>
       </div>
     </div>
