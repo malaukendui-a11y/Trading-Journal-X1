@@ -1,3 +1,5 @@
+import { isValidElement } from 'react'
+
 export function EmptyState({
   icon: Icon,
   title,
@@ -11,7 +13,7 @@ export function EmptyState({
     >
       {Icon && (
         <div className="w-12 h-12 mb-4 rounded-full bg-bg-panel-raised flex items-center justify-center text-text-secondary border border-line">
-          {typeof Icon === 'function' ? <Icon className="w-6 h-6" /> : Icon}
+          {isValidElement(Icon) ? Icon : <Icon className="w-6 h-6" />}
         </div>
       )}
       {title && (

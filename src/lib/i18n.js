@@ -37,6 +37,9 @@ export const translations = {
       notFoundTitle: 'Halaman Tidak Ditemukan',
       notFoundDesc: 'Halaman yang Anda tuju tidak tersedia.',
       backToHome: 'Kembali ke Dashboard',
+      crashTitle: 'Terjadi Gangguan pada Halaman',
+      crashDesc: 'Halaman ini mengalami gangguan tidak terduga. Silakan coba muat ulang.',
+      reload: 'Muat Ulang Halaman',
     },
     nav: {
       dashboard: 'Dashboard',
@@ -265,6 +268,9 @@ export const translations = {
       notFoundTitle: 'Page Not Found',
       notFoundDesc: 'The page you are looking for does not exist.',
       backToHome: 'Back to Dashboard',
+      crashTitle: 'Page Error Occurred',
+      crashDesc: 'This page encountered an unexpected error. Please try reloading.',
+      reload: 'Reload Page',
     },
     nav: {
       dashboard: 'Dashboard',

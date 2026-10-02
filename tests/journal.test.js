@@ -241,3 +241,72 @@ describe('M3: Deterministic Journal Sorting', () => {
   })
 })
 
+describe('M3: Regression & Runtime Crash Safety', () => {
+  it('EmptyState aman merender icon berupa forwardRef component (seperti BookOpen dari lucide-react)', async () => {
+    const React = (await import('react')).default
+    const { renderToString } = await import('react-dom/server')
+    const { BookOpen } = await import('lucide-react')
+    const { EmptyState } = await import('../src/components/ui/EmptyState.jsx')
+
+    expect(() => {
+      renderToString(
+        React.createElement(EmptyState, {
+          icon: BookOpen,
+          title: 'Belum Ada Catatan Trade',
+          description: 'Mulai catat trade Anda',
+        })
+      )
+    }).not.toThrow()
+  })
+
+  it('EmptyState aman merender icon yang sudah berupa elemen JSX', async () => {
+    const React = (await import('react')).default
+    const { renderToString } = await import('react-dom/server')
+    const { BookOpen } = await import('lucide-react')
+    const { EmptyState } = await import('../src/components/ui/EmptyState.jsx')
+
+    expect(() => {
+      renderToString(
+        React.createElement(EmptyState, {
+          icon: React.createElement(BookOpen, { className: 'w-6 h-6' }),
+          title: 'Belum Ada Catatan Trade',
+          description: 'Mulai catat trade Anda',
+        })
+      )
+    }).not.toThrow()
+  })
+
+  it('ErrorBoundary mengaktifkan hasError dan merender fallback aman saat terjadi error', async () => {
+    const React = (await import('react')).default
+    const { renderToString } = await import('react-dom/server')
+    const { ErrorBoundary } = await import('../src/components/ErrorBoundary.jsx')
+    const { LanguageProvider } = await import('../src/context/LanguageContext.jsx')
+
+    // 1. Verifikasi getDerivedStateFromError menghasilkan hasError = true
+    const derived = ErrorBoundary.getDerivedStateFromError(new Error('Simulated Crash'))
+    expect(derived).toEqual({ hasError: true })
+
+    // 2. Verifikasi render fallback saat state error aktif
+    class ControlledErrorBoundary extends ErrorBoundary {
+      constructor(props) {
+        super(props)
+        this.state = { hasError: true }
+      }
+    }
+
+    const html = renderToString(
+      React.createElement(
+        LanguageProvider,
+        null,
+        React.createElement(ControlledErrorBoundary, null, 'Normal Content')
+      )
+    )
+
+    expect(html).toContain('Terjadi Gangguan pada Halaman')
+    expect(html).toContain('Muat Ulang Halaman')
+    expect(html).not.toContain('Normal Content')
+  })
+})
+
+
+
