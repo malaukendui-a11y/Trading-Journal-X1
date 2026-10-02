@@ -196,3 +196,4 @@ describe('M4: CalculatorView Component Render Tests (SSR / Node)', () => {
     expect(html).toContain(translate('id', 'calculator.errorZeroDistance'))
   })
 })
+

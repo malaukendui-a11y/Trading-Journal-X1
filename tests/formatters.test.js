@@ -67,3 +67,4 @@ describe('M4: Formatters Unit Tests (FR-CALC-5 & Correction 6)', () => {
     expect(formatPrice(100.2, 'en')).toBe('100.2')
   })
 })
+
