@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { JournalProvider } from './context/JournalContext.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { UserSettingsProvider } from './context/UserSettingsContext.jsx'
 import { AnalyticsPage } from './pages/AnalyticsPage.jsx'
 import { AuthPage } from './pages/AuthPage.jsx'
 import { CalculatorPage } from './pages/CalculatorPage.jsx'
@@ -18,11 +19,13 @@ function ProtectedLayout() {
   const { user } = useAuth()
 
   return (
-    <JournalProvider key={user?.id || 'guest'}>
-      <AppShell>
-        <Outlet />
-      </AppShell>
-    </JournalProvider>
+    <UserSettingsProvider key={user?.id || 'guest'}>
+      <JournalProvider key={user?.id || 'guest'}>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </JournalProvider>
+    </UserSettingsProvider>
   )
 }
 

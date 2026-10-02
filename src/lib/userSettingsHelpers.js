@@ -59,3 +59,38 @@ export function buildUserSettingsPayload(fields = {}) {
   return payload
 }
 
+/**
+ * Memvalidasi input saldo akun untuk pembaruan profil pengguna (FR-DASH-2).
+ * String kosong, spasi, bukan angka, nilai negatif (< 0), atau lebih besar dari 1e12 dinyatakan TIDAK valid.
+ * JANGAN mengubah string kosong '' atau spasi menjadi 0.
+ *
+ * @param {any} input
+ * @returns {{ ok: true, value: number } | { ok: false, error: string }}
+ */
+export function validateBalanceInput(input) {
+  if (input === null || input === undefined) {
+    return { ok: false, error: 'dashboard.errorInvalidBalance' }
+  }
+
+  if (typeof input === 'string') {
+    const trimmed = input.trim()
+    if (trimmed === '') {
+      return { ok: false, error: 'dashboard.errorInvalidBalance' }
+    }
+    const num = Number(trimmed)
+    if (!Number.isFinite(num) || isNaN(num) || num < 0 || num > 1e12) {
+      return { ok: false, error: 'dashboard.errorInvalidBalance' }
+    }
+    return { ok: true, value: num }
+  }
+
+  if (typeof input === 'number') {
+    if (!Number.isFinite(input) || isNaN(input) || input < 0 || input > 1e12) {
+      return { ok: false, error: 'dashboard.errorInvalidBalance' }
+    }
+    return { ok: true, value: input }
+  }
+
+  return { ok: false, error: 'dashboard.errorInvalidBalance' }
+}
+

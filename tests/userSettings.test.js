@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { createElement } from 'react'
+import { renderToString } from 'react-dom/server'
 import {
   buildUserSettingsPayload,
+  validateBalanceInput,
   validateLang,
   validateTheme,
 } from '../src/lib/userSettingsHelpers.js'
+import { useUserSettings } from '../src/hooks/useUserSettings.js'
 
 describe('M2: User Settings Validation Helpers', () => {
   it('memvalidasi tema hanya light atau dark, selain itu fallback ke dark', () => {
@@ -56,4 +60,62 @@ describe('M2: User Settings Validation Helpers', () => {
     expect(payload.display_name).toBe('Trader')
   })
 })
+
+describe('M5: validateBalanceInput (FR-DASH-2)', () => {
+  it('menolak string kosong dan spasi tanpa mengubahnya menjadi 0', () => {
+    const emptyRes = validateBalanceInput('')
+    expect(emptyRes.ok).toBe(false)
+    expect(emptyRes.error).toBe('dashboard.errorInvalidBalance')
+
+    const spaceRes = validateBalanceInput('   ')
+    expect(spaceRes.ok).toBe(false)
+    expect(spaceRes.error).toBe('dashboard.errorInvalidBalance')
+  })
+
+  it('menolak angka negatif, angka melebihi 1e12, dan string non-numerik', () => {
+    const negRes = validateBalanceInput('-1')
+    expect(negRes.ok).toBe(false)
+    expect(negRes.error).toBe('dashboard.errorInvalidBalance')
+
+    const overRes = validateBalanceInput('1e13')
+    expect(overRes.ok).toBe(false)
+    expect(overRes.error).toBe('dashboard.errorInvalidBalance')
+
+    const abcRes = validateBalanceInput('abc')
+    expect(abcRes.ok).toBe(false)
+    expect(abcRes.error).toBe('dashboard.errorInvalidBalance')
+  })
+
+  it('menerima angka valid seperti 0 dan 1000', () => {
+    const zeroRes = validateBalanceInput('0')
+    expect(zeroRes.ok).toBe(true)
+    expect(zeroRes.value).toBe(0)
+
+    const thousandRes = validateBalanceInput('1000')
+    expect(thousandRes.ok).toBe(true)
+    expect(thousandRes.value).toBe(1000)
+
+    const numZero = validateBalanceInput(0)
+    expect(numZero.ok).toBe(true)
+    expect(numZero.value).toBe(0)
+
+    const numThousand = validateBalanceInput(1000)
+    expect(numThousand.ok).toBe(true)
+    expect(numThousand.value).toBe(1000)
+  })
+})
+
+describe('M5: useUserSettings Consumer Hook', () => {
+  it('melempar error jika digunakan di luar UserSettingsProvider', () => {
+    function ConsumerWithoutProvider() {
+      useUserSettings()
+      return null
+    }
+
+    expect(() => {
+      renderToString(createElement(ConsumerWithoutProvider))
+    }).toThrow('useUserSettings must be used within a UserSettingsProvider')
+  })
+})
+
 

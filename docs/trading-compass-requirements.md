@@ -1,6 +1,6 @@
 # Trading Compass — Requirements Specification
 
-**Versi:** 1.3 — FR-CALC direvisi (konvensi lot Forex/Emas, toleransi floating-point saham, validasi, golden test vectors).
+**Versi:** 1.4 — definisi presisi Dashboard (FR-DASH-1..5) dan aturan grid/skala warna kalender bersama (FR-CAL-6), melengkapi revisi FR-CALC v1.3.
 **Status:** Siap dipakai sebagai spec definitif untuk mulai development.
 **Sumber:** Diturunkan dari aplikasi lama `journal-trading-x1-supabase.html` (dianalisis langsung dari kode) + keputusan scope hasil diskusi. Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -55,10 +55,29 @@ Format: **EARS** (WHEN/IF/THE SYSTEM SHALL) — format yang sama dipakai Kiro un
 
 ### 3.2 Dashboard (Ringkasan)
 
-- **FR-DASH-1:** THE SYSTEM SHALL menampilkan stat grid: total trade, win rate (%), jumlah revenge trade, total P&L — dihitung dari seluruh `journal_entries` milik pengguna.
-- **FR-DASH-2:** THE SYSTEM SHALL menyediakan input saldo akun yang tersimpan per pengguna dan menjadi nilai default di Kalkulator.
-- **FR-DASH-3 (dikonfirmasi):** THE SYSTEM SHALL menampilkan preview mini heatmap kalender bulan berjalan yang bisa diklik menuju tab Kalender penuh.
-- **FR-DASH-4 (dikonfirmasi):** THE SYSTEM SHALL menampilkan daftar 5 trade terakhir dengan tautan ke tab Jurnal.
+Dashboard memakai data yang sama dengan Jurnal (`JournalContext`) dan pengaturan yang sama dengan TopBar dan Kalkulator. Ring Skor Disiplin **tidak** ada di Dashboard (pindah ke Analytics, FR-ANA-3).
+
+- **FR-DASH-1 (Stat grid, definisi mengikuti aplikasi lama):**
+  ```
+  total        = jumlah seluruh trade milik pengguna
+  wins         = jumlah trade dengan pnl > 0          (pnl = 0 bukan win, tetapi tetap dihitung di total)
+  winRate      = total > 0 ? Math.round(wins / total × 100) : null    (persen bulat; null tampil "—")
+  revengeCount = jumlah trade dengan status = 'revenge'
+  totalPnl     = Σ pnl                                 (tampil 2 desimal; warna sage jika ≥ 0, brick jika < 0)
+  ```
+  Satu-satunya perbedaan dari aplikasi lama: saat belum ada trade, win rate tampil "—" (aplikasi lama menampilkan "0%" yang menyesatkan).
+- **FR-DASH-2 (Saldo akun):** input inline. Validasi: angka finite, 0 ≤ saldo ≤ 1e12. Disimpan ke `user_settings.balance` (dengan `updated_at`) saat **blur** atau **Enter**, dilewati jika nilainya tidak berubah. Update yang mengenai 0 baris dianggap gagal. Saat gagal: nilai kembali ke nilai tersimpan dan pesan generik tampil. Setelah tersimpan, saldo di TopBar dan nilai awal Kalkulator langsung memakai nilai baru tanpa refresh (state pengaturan dipakai bersama).
+- **FR-DASH-3 (Mini heatmap):** grid bulan berjalan (zona waktu lokal) memakai aturan FR-CAL-6 yang sama persis dengan halaman Kalender. Seluruh kartu adalah satu tautan ke `/calendar`.
+- **FR-DASH-4 (5 trade terakhir):** lima entri teratas dengan urutan yang sama dengan Jurnal (`trade_date desc, created_at desc, id desc`), dengan tautan ke `/journal`. Saat belum ada trade, tampil state kosong dengan tautan ke Jurnal.
+- **FR-DASH-5 (Golden test vectors):**
+
+  | ID | Data | Hasil |
+  |---|---|---|
+  | S0 | tanpa trade | total 0; winRate null ("—"); revenge 0; totalPnl 0 |
+  | S1 | pnl [100, −50, 0, 25.5, −10], status [plan, revenge, plan, plan, revenge] | total 5; wins 2; winRate 40; revenge 2; totalPnl 65.5 |
+  | S2 | pnl [0.1, 0.2] | totalPnl ≈ 0.30000000000000004 → tampil $0.30 (EN); winRate 100 |
+  | S3 | 2 menang dari 3 | winRate 67 |
+  | S4 | 1 menang dari 8 | winRate 13 (`Math.round(12.5)` = 13) |
 
 ### 3.3 Kalkulator Risiko
 
@@ -143,6 +162,22 @@ Input yang sama dipakai bersama oleh ketiga mode (saldo, risiko %, entry, SL, TP
 - **FR-CAL-3:** THE SYSTEM SHALL menyediakan navigasi bulan sebelumnya/berikutnya dan tombol kembali ke bulan berjalan.
 - **FR-CAL-4:** THE SYSTEM SHALL menampilkan ringkasan bulan yang sedang ditampilkan: total P&L, win rate, jumlah hari trading.
 - **FR-CAL-5:** Hari tanpa trade SHALL ditampilkan netral, dibedakan visual dari hari dengan trade tapi P&L = 0.
+- **FR-CAL-6 (Aturan grid & skala warna — dipakai bersama Kalender dan mini heatmap Dashboard, satu modul `src/lib/calendarAggregations.js`):**
+  ```
+  dailyPnl   : kelompokkan trade per string trade_date 'YYYY-MM-DD' (tanpa konversi zona waktu) -> { pnl, count }
+  grid bulan : minggu dimulai SENIN; sel sebelum tanggal 1 dan setelah tanggal terakhir kosong; jumlah minggu 4-6
+  maxAbs     : max |pnl harian| di antara hari yang punya trade pada bulan yang ditampilkan
+  level hari : tidak ada trade -> 'none'
+               ada trade, pnl = 0 -> 'flat' (netral + penanda, beda dari 'none')
+               lainnya -> 'profit-N' / 'loss-N', N = clamp(ceil(|pnl| / maxAbs × 4), 1, 4)
+  ```
+  Warna: sage (profit) dan brick (loss) dengan 4 tingkat intensitas, terbaca di tema terang dan gelap. Warna bukan satu-satunya penanda (tooltip/label berisi tanggal dan P&L).
+
+  | ID | Data | Hasil |
+  |---|---|---|
+  | C1 | Okt 2026 | 1 Okt = Kamis; 3 sel kosong di depan; 31 hari; 5 minggu; 1 sel kosong di belakang |
+  | C2 | Feb 2027 / Feb 2028 / Nov 2026 | 4 minggu (mulai Senin) / 5 minggu, 29 hari (kabisat) / 6 minggu |
+  | C3 | Okt 2026: 1 Okt pnl 60+40, 2 Okt −25, 5 Okt 0, 7 Okt 10, 8 Okt −60, 30 Sep 500 | maxAbs 100 (30 Sep tidak dihitung); 1 Okt profit-4; 2 Okt loss-1; 5 Okt flat; 7 Okt profit-1; 8 Okt loss-3; hari lain none |
 
 ### 3.6 Analytics (BARU)
 
