@@ -1,6 +1,6 @@
 # Trading Compass — Requirements Specification
 
-**Versi:** 1.4 — definisi presisi Dashboard (FR-DASH-1..5) dan aturan grid/skala warna kalender bersama (FR-CAL-6), melengkapi revisi FR-CALC v1.3.
+**Versi:** 1.5 — Kalender: perilaku modal (FR-CAL-2), definisi ringkasan bulanan (FR-CAL-4), navigasi dan golden vectors (FR-CAL-7); melengkapi v1.4 (Dashboard, aturan kalender bersama) dan v1.3 (FR-CALC).
 **Status:** Siap dipakai sebagai spec definitif untuk mulai development.
 **Sumber:** Diturunkan dari aplikasi lama `journal-trading-x1-supabase.html` (dianalisis langsung dari kode) + keputusan scope hasil diskusi. Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -158,9 +158,9 @@ Input yang sama dipakai bersama oleh ketiga mode (saldo, risiko %, entry, SL, TP
 ### 3.5 Kalender (BARU)
 
 - **FR-CAL-1:** THE SYSTEM SHALL menampilkan grid kalender bulanan; tiap sel tanggal diwarnai berdasarkan total P&L hari itu (hijau untuk profit, merah untuk loss, netral untuk tidak ada trade), dengan intensitas warna mengikuti besaran P&L (gradasi, dikonfirmasi).
-- **FR-CAL-2:** WHEN pengguna klik tanggal yang memiliki trade, THE SYSTEM SHALL membuka panel/modal berisi daftar trade pada tanggal tersebut (field sama seperti Jurnal).
+- **FR-CAL-2:** WHEN pengguna klik tanggal yang memiliki trade, THE SYSTEM SHALL membuka panel/modal berisi daftar trade pada tanggal tersebut (field sama seperti Jurnal; urutan `created_at desc, id desc`). Modal hanya untuk melihat (tanpa tambah/hapus). Tanggal tanpa trade tidak bisa diklik. Escape atau tombol tutup menutup modal dan fokus kembali ke sel tanggal.
 - **FR-CAL-3:** THE SYSTEM SHALL menyediakan navigasi bulan sebelumnya/berikutnya dan tombol kembali ke bulan berjalan.
-- **FR-CAL-4:** THE SYSTEM SHALL menampilkan ringkasan bulan yang sedang ditampilkan: total P&L, win rate, jumlah hari trading.
+- **FR-CAL-4:** THE SYSTEM SHALL menampilkan ringkasan bulan yang sedang ditampilkan, dihitung dari trade yang `trade_date`-nya berada di bulan itu dengan definisi yang **sama** dengan FR-DASH-1: total P&L = Σ pnl; win rate = `Math.round(menang / total × 100)` dengan menang = pnl > 0 ("—" jika belum ada trade); jumlah hari trading = jumlah tanggal berbeda yang punya trade.
 - **FR-CAL-5:** Hari tanpa trade SHALL ditampilkan netral, dibedakan visual dari hari dengan trade tapi P&L = 0.
 - **FR-CAL-6 (Aturan grid & skala warna — dipakai bersama Kalender dan mini heatmap Dashboard, satu modul `src/lib/calendarAggregations.js`):**
   ```
@@ -178,6 +178,17 @@ Input yang sama dipakai bersama oleh ketiga mode (saldo, risiko %, entry, SL, TP
   | C1 | Okt 2026 | 1 Okt = Kamis; 3 sel kosong di depan; 31 hari; 5 minggu; 1 sel kosong di belakang |
   | C2 | Feb 2027 / Feb 2028 / Nov 2026 | 4 minggu (mulai Senin) / 5 minggu, 29 hari (kabisat) / 6 minggu |
   | C3 | Okt 2026: 1 Okt pnl 60+40, 2 Okt −25, 5 Okt 0, 7 Okt 10, 8 Okt −60, 30 Sep 500 | maxAbs 100 (30 Sep tidak dihitung); 1 Okt profit-4; 2 Okt loss-1; 5 Okt flat; 7 Okt profit-1; 8 Okt loss-3; hari lain none |
+
+- **FR-CAL-7 (Navigasi & golden test vectors halaman Kalender):** perpindahan bulan dihitung dengan aritmetika tahun-bulan (bukan objek `Date` yang digeser), sehingga Desember → Januari dan Januari → Desember berpindah tahun dengan benar. Bulan awal = bulan berjalan (lokal).
+
+  | ID | Data / aksi | Hasil |
+  |---|---|---|
+  | K1 | data C3, Okt 2026 | total P&L 25; win rate 50; hari trading 5 |
+  | K2 | data C3, Sep 2026 | total P&L 500; win rate 100; hari trading 1 |
+  | K3 | data C3, Nov 2026 | total P&L 0; win rate "—" (null); hari trading 0 |
+  | N1 | Des 2026 + 1 bulan / Jan 2026 − 1 bulan | Jan 2027 / Des 2025 |
+  | N2 | Okt 2026 − 12 bulan / Okt 2026 + 15 bulan | Okt 2025 / Jan 2028 |
+  | D1 | 1 Okt: trade pnl 60 dibuat lebih dulu, lalu trade pnl 40 | daftar di modal: 40, lalu 60 |
 
 ### 3.6 Analytics (BARU)
 

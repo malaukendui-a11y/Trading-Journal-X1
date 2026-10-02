@@ -4,6 +4,8 @@
  * Tidak bergantung pada JSX, Supabase, atau DOM, dan tidak pernah melempar exception.
  */
 
+import { computeDashboardStats } from './dashboardStats.js'
+
 /**
  * Mengelompokkan daftar journal entries ke dalam map harian berdasarkan trade_date ('YYYY-MM-DD').
  * Memakai string trade_date tanpa konversi zona waktu (UTC).
@@ -176,4 +178,114 @@ export function dayLevel(day, maxAbs) {
   const N = Math.min(4, Math.max(1, Math.ceil(ratio * 4)))
 
   return pnl > 0 ? `profit-${N}` : `loss-${N}`
+}
+
+/**
+ * Menggeser bulan dengan aritmetika tahun dan bulan (FR-CAL-7, N1, N2).
+ * DILARANG memakai Date.setMonth (karena 31 Jan + 1 bulan = 3 Mar akibat rollover hari).
+ *
+ * @param {number} year
+ * @param {number} month (1-12)
+ * @param {number} delta Perpindahan bulan (+1, -1, +15, -12, dsb.)
+ * @returns {{ year: number, month: number }}
+ */
+export function shiftMonth(year, month, delta = 0) {
+  if (year === null || year === undefined || month === null || month === undefined) {
+    return { year: 2026, month: 1 }
+  }
+
+  const y = Number(year)
+  const m = Number(month)
+  const d = Number(delta) || 0
+
+  if (!Number.isFinite(y) || !Number.isFinite(m) || y <= 0 || m < 1 || m > 12) {
+    return { year: 2026, month: 1 }
+  }
+
+  const totalMonths = y * 12 + (m - 1) + d
+  const newYear = Math.floor(totalMonths / 12)
+  const newMonth = ((totalMonths % 12) + 12) % 12 + 1
+
+  return { year: newYear, month: newMonth }
+}
+
+/**
+ * Menyaring entri jurnal yang trade_date-nya berada pada bulan dan tahun tertentu.
+ * Menggunakan perbandingan prefix string 'YYYY-MM-' tanpa konversi zona waktu (UTC).
+ *
+ * @param {Array<Object>} entries
+ * @param {number} year
+ * @param {number} month (1-12)
+ * @returns {Array<Object>}
+ */
+export function entriesInMonth(entries, year, month) {
+  if (!Array.isArray(entries)) return []
+  const y = Number(year)
+  const m = Number(month)
+  if (!Number.isFinite(y) || !Number.isFinite(m) || m < 1 || m > 12) return []
+
+  const prefix = `${y}-${String(m).padStart(2, '0')}-`
+  return entries.filter(
+    (e) => typeof e?.trade_date === 'string' && e.trade_date.startsWith(prefix)
+  )
+}
+
+/**
+ * Menghitung ringkasan performa bulanan (FR-CAL-4, K1-K3).
+ * Memakai ulang computeDashboardStats untuk totalPnl dan winRate agar konsisten 100% dengan Dashboard.
+ *
+ * @param {Array<Object>} entries
+ * @param {number} year
+ * @param {number} month (1-12)
+ * @returns {{
+ *   total: number,
+ *   totalPnl: number,
+ *   winRate: number|null,
+ *   tradingDays: number
+ * }}
+ */
+export function monthSummary(entries, year, month) {
+  const monthEntries = entriesInMonth(entries, year, month)
+  const stats = computeDashboardStats(monthEntries)
+
+  const distinctDates = new Set()
+  for (let i = 0; i < monthEntries.length; i++) {
+    const d = monthEntries[i]?.trade_date
+    if (d) {
+      distinctDates.add(d)
+    }
+  }
+
+  return {
+    total: stats.total,
+    totalPnl: stats.totalPnl,
+    winRate: stats.winRate,
+    tradingDays: distinctDates.size,
+  }
+}
+
+/**
+ * Mengambil dan mengurutkan daftar trade untuk tanggal tertentu (FR-CAL-2, D1).
+ * Urutan: created_at descending (terbaru di atas), lalu id descending.
+ *
+ * @param {Array<Object>} entries
+ * @param {string} isoDate 'YYYY-MM-DD'
+ * @returns {Array<Object>}
+ */
+export function entriesForDate(entries, isoDate) {
+  if (!Array.isArray(entries) || !isoDate || typeof isoDate !== 'string') return []
+
+  const filtered = entries.filter((e) => e?.trade_date === isoDate)
+
+  return filtered.sort((a, b) => {
+    // 1. created_at desc
+    const timeA = a?.created_at ? new Date(a.created_at).getTime() : 0
+    const timeB = b?.created_at ? new Date(b.created_at).getTime() : 0
+    if (timeA !== timeB) {
+      return timeB - timeA
+    }
+
+    // 2. id desc
+    return String(b?.id || '').localeCompare(String(a?.id || ''))
+  })
 }

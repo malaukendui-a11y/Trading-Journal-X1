@@ -2,8 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   buildMonthGrid,
   dayLevel,
+  entriesForDate,
+  entriesInMonth,
   groupDailyPnl,
   monthMaxAbs,
+  monthSummary,
+  shiftMonth,
 } from '../src/lib/calendarAggregations.js'
 
 describe('M5: calendarAggregations (FR-CAL-6)', () => {
@@ -153,4 +157,99 @@ describe('M5: calendarAggregations (FR-CAL-6)', () => {
       expect(monthMaxAbs({ '2026-09-01': { pnl: 100, count: 1 } }, 2026, 10)).toBe(0)
     })
   })
+
+  describe('FR-CAL-7: shiftMonth (Aritmetika Bulan & Tahun, N1, N2)', () => {
+    it('N1: Des 2026 + 1 bulan = Jan 2027 dan Jan 2026 - 1 bulan = Des 2025', () => {
+      expect(shiftMonth(2026, 12, 1)).toEqual({ year: 2027, month: 1 })
+      expect(shiftMonth(2026, 1, -1)).toEqual({ year: 2025, month: 12 })
+    })
+
+    it('N2: Okt 2026 - 12 bulan = Okt 2025 dan Okt 2026 + 15 bulan = Jan 2028', () => {
+      expect(shiftMonth(2026, 10, -12)).toEqual({ year: 2025, month: 10 })
+      expect(shiftMonth(2026, 10, 15)).toEqual({ year: 2028, month: 1 })
+    })
+
+    it('kebal input tidak valid dan fallback aman', () => {
+      expect(shiftMonth(null, 10, 1)).toEqual({ year: 2026, month: 1 })
+      expect(shiftMonth(2026, 13, 1)).toEqual({ year: 2026, month: 1 })
+      expect(shiftMonth(2026, 0, 1)).toEqual({ year: 2026, month: 1 })
+    })
+  })
+
+  describe('FR-CAL-4: monthSummary (Ringkasan Bulanan, K1, K2, K3)', () => {
+    const c3Entries = [
+      { trade_date: '2026-10-01', pnl: 60, status: 'plan' },
+      { trade_date: '2026-10-01', pnl: 40, status: 'plan' },
+      { trade_date: '2026-10-02', pnl: -25, status: 'plan' },
+      { trade_date: '2026-10-05', pnl: 0, status: 'plan' },
+      { trade_date: '2026-10-07', pnl: 10, status: 'plan' },
+      { trade_date: '2026-10-08', pnl: -60, status: 'revenge' },
+      { trade_date: '2026-09-30', pnl: 500, status: 'plan' },
+    ]
+
+    it('K1: data C3, Okt 2026 -> total P&L 25, win rate 50, hari trading 5', () => {
+      const summary = monthSummary(c3Entries, 2026, 10)
+      expect(summary.total).toBe(6)
+      expect(summary.totalPnl).toBe(25)
+      expect(summary.winRate).toBe(50)
+      expect(summary.tradingDays).toBe(5)
+    })
+
+    it('K2: data C3, Sep 2026 -> total P&L 500, win rate 100, hari trading 1', () => {
+      const summary = monthSummary(c3Entries, 2026, 9)
+      expect(summary.total).toBe(1)
+      expect(summary.totalPnl).toBe(500)
+      expect(summary.winRate).toBe(100)
+      expect(summary.tradingDays).toBe(1)
+    })
+
+    it('K3: data C3, Nov 2026 -> total P&L 0, win rate "—" (null), hari trading 0', () => {
+      const summary = monthSummary(c3Entries, 2026, 11)
+      expect(summary.total).toBe(0)
+      expect(summary.totalPnl).toBe(0)
+      expect(summary.winRate).toBeNull()
+      expect(summary.tradingDays).toBe(0)
+    })
+  })
+
+  describe('FR-CAL-2: entriesForDate (D1)', () => {
+    it('D1: 1 Okt: trade pnl 60 dibuat lebih dulu, lalu trade pnl 40 -> daftar di modal: 40, lalu 60', () => {
+      const entries = [
+        {
+          id: 't-1',
+          trade_date: '2026-10-01',
+          pnl: 60,
+          created_at: '2026-10-01T08:00:00Z',
+          instrument: 'BTC/USDT',
+        },
+        {
+          id: 't-2',
+          trade_date: '2026-10-01',
+          pnl: 40,
+          created_at: '2026-10-01T09:30:00Z',
+          instrument: 'ETH/USDT',
+        },
+        {
+          id: 't-3',
+          trade_date: '2026-10-02',
+          pnl: -25,
+          created_at: '2026-10-02T10:00:00Z',
+          instrument: 'SOL/USDT',
+        },
+      ]
+
+      const result = entriesForDate(entries, '2026-10-01')
+      expect(result.length).toBe(2)
+      expect(result[0].pnl).toBe(40)
+      expect(result[0].id).toBe('t-2')
+      expect(result[1].pnl).toBe(60)
+      expect(result[1].id).toBe('t-1')
+    })
+
+    it('mengembalikan array kosong jika input tidak valid', () => {
+      expect(entriesForDate(null, '2026-10-01')).toEqual([])
+      expect(entriesForDate([], null)).toEqual([])
+    })
+  })
 })
+
