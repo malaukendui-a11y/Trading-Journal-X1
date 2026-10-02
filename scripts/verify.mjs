@@ -77,6 +77,16 @@ for (const file of [...walk('src'), 'index.html'].filter(existsSync)) {
 }
 hits.length ? fail('Pola terlarang ditemukan', '\n    ' + hits.join('\n    ')) : pass('Tidak ada pola terlarang di src/')
 
+// 5b. Halaman yang masih placeholder (deteksi file yang kembali ke versi lama)
+if (existsSync(join('src', 'pages'))) {
+  const placeholders = readdirSync(join('src', 'pages'))
+    .filter((n) => n.endsWith('.jsx'))
+    .filter((n) => /moduleUpcoming|next development phase|akan dibangun/i.test(readFileSync(join('src', 'pages', n), 'utf8')))
+  placeholders.length
+    ? warn('Halaman yang MASIH placeholder (pastikan modul yang sedang dikerjakan TIDAK ada di daftar ini)', placeholders.join(', '))
+    : pass('Tidak ada halaman placeholder')
+}
+
 // 6. Tes, lint (jika ada), build
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
 const tests = run('npx vitest run')
