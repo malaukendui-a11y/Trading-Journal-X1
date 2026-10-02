@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './components/auth/ProtectedRoute.jsx'
 import { AppShell } from './components/layout/AppShell.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
@@ -19,7 +19,9 @@ function ProtectedLayout() {
 
   return (
     <JournalProvider key={user?.id || 'guest'}>
-      <AppShell />
+      <AppShell>
+        <Outlet />
+      </AppShell>
     </JournalProvider>
   )
 }
