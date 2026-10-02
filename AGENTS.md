@@ -29,7 +29,8 @@ Checklist SMC (tab gerbang + kriteria + verdict) dan Status Strip.
 - Validasi input di client sebelum kirim ke Supabase.
 
 ## Akurasi formula (paling kritis)
-- Rumus Kalkulator (FR-CALC-1..4) dan skor disiplin harus PERSIS seperti di requirements.md, termasuk perbaikan lot forex (100.000 / 10.000 / 1.000 unit).
+- Rumus Kalkulator (FR-CALC-1..7) dan skor disiplin harus PERSIS seperti di requirements.md: konvensi lot memakai `contractSize` (preset Forex 100.000 / Emas 100 oz, bisa diedit), dan lembar saham memakai `floor(raw × (1 + 1e-9))`. Golden test vectors FR-CALC-7 wajib ada sebagai tes.
+- Fungsi kalkulasi tidak pernah melempar exception: kembalikan `{ ok: false, errors }` atau `{ ok: true, ... }`.
 - Untuk setiap fungsi kalkulasi, tulis unit test (Vitest) dengan minimal 5 skenario input/output.
 - Kolom tanggal jurnal = `trade_date` bertipe `date`, bukan string terformat.
 
@@ -38,3 +39,7 @@ Checklist SMC (tab gerbang + kriteria + verdict) dan Status Strip.
 - Sebelum menjalankan perintah terminal yang mengubah banyak hal (install paket, hapus file, git), jelaskan dulu alasannya.
 - Jangan menjalankan `git push`, `git push --force`, atau `git reset --hard`. Commit dilakukan oleh Kenny setelah verifikasi.
 - Jangan mengubah file di luar cakupan modul yang sedang dikerjakan.
+- JANGAN menjalankan `npm run dev` atau server jangka panjang apa pun. Hanya Kenny yang menjalankan dev server. Untuk verifikasi pakai `npm run build` dan `npx vitest run`.
+- Untuk file yang sudah ada, ubah dengan edit terarah. JANGAN membuat ulang (menimpa) seluruh file kecuali diminta. Kalau terpaksa menulis ulang, baca dulu isi terbaru dari disk dan pastikan semua perilaku modul sebelumnya (M0 dan seterusnya) tetap ada.
+- Perintah git hanya yang read-only (`status`, `diff`, `log`, `show`). Jangan `checkout`, `restore`, `reset`, `stash`, `commit`, atau `push`.
+- Kalau hasil verifikasi tidak cocok dengan dugaan awal, katakan apa adanya dan tunjukkan buktinya (isi file, output perintah). Jangan menebak penyebab lalu mengklaimnya sebagai fakta.

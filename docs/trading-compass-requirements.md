@@ -1,6 +1,6 @@
 # Trading Compass — Requirements Specification
 
-**Versi:** 1.2 — final. Seluruh item Asumsi & Item Terbuka (bagian 5) sudah dikonfirmasi Anda.
+**Versi:** 1.3 — FR-CALC direvisi (konvensi lot Forex/Emas, toleransi floating-point saham, validasi, golden test vectors).
 **Status:** Siap dipakai sebagai spec definitif untuk mulai development.
 **Sumber:** Diturunkan dari aplikasi lama `journal-trading-x1-supabase.html` (dianalisis langsung dari kode) + keputusan scope hasil diskusi. Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -49,6 +49,7 @@ Format: **EARS** (WHEN/IF/THE SYSTEM SHALL) — format yang sama dipakai Kiro un
 - **FR-AUTH-1:** WHEN pengguna submit email & password valid pada form login, THE SYSTEM SHALL mengautentikasi via Supabase Auth dan mengarahkan ke Dashboard.
 - **FR-AUTH-2:** WHEN pengguna submit form registrasi dengan email unik dan password ≥ 6 karakter, THE SYSTEM SHALL membuat akun baru di Supabase Auth.
 - **FR-AUTH-3:** WHEN pengguna meminta reset password, THE SYSTEM SHALL mengirim link reset via Supabase Auth.
+- **FR-AUTH-3b:** WHEN pengguna membuka link reset dari email, THE SYSTEM SHALL menampilkan halaman `/reset-password` berisi form password baru (≥ 6 karakter, dengan konfirmasi), menyimpannya via Supabase Auth, lalu mengarahkan ke Dashboard. (Tanpa halaman ini link reset tidak berguna.)
 - **FR-AUTH-4:** IF sesi login valid masih ada, THEN THE SYSTEM SHALL memulihkan sesi otomatis saat halaman dimuat ulang.
 - **FR-AUTH-5:** WHEN pengguna logout, THE SYSTEM SHALL menghapus sesi dan kembali ke layar Auth.
 
@@ -61,40 +62,72 @@ Format: **EARS** (WHEN/IF/THE SYSTEM SHALL) — format yang sama dipakai Kiro un
 
 ### 3.3 Kalkulator Risiko
 
-Logika berikut **wajib identik** dengan versi lama (regression parity) — angka input yang sama harus menghasilkan angka output yang sama persis.
+Rumus dasar mengikuti aplikasi lama, dengan dua koreksi yang disengaja: konvensi lot (FR-CALC-2) dan pembulatan lembar saham terhadap galat floating-point (FR-CALC-3). Semua fungsi kalkulasi murni (tanpa JSX, tanpa akses jaringan) dan **tidak pernah melempar exception**: hasilnya selalu `{ ok: false, errors }` atau `{ ok: true, ... }`. Kalkulator tidak menulis apa pun ke database.
 
 **Variabel dasar (semua mode):**
 ```
 riskAmount = balance × (riskPercent / 100)
 distance   = |entryPrice − stopLossPrice|
-rrRatio    = |takeProfitPrice − entryPrice| / distance   (ditampilkan "1 : X.XX", kosong jika TP tidak diisi)
+rrRatio    = |takeProfitPrice − entryPrice| / distance   (null jika TP tidak diisi; tampil "1 : X.XX")
 ```
+Input yang sama dipakai bersama oleh ketiga mode (saldo, risiko %, entry, SL, TP). Mode default: Crypto.
 
 - **FR-CALC-1 (Mode Crypto):**
   ```
   distancePercent = (distance / entryPrice) × 100
   notionalValue   = riskAmount / (distancePercent / 100)
   coinSize        = notionalValue / entryPrice
-  marginRequired  = notionalValue / leverage
+  marginRequired  = notionalValue / leverage            (leverage ≥ 1)
   ```
-  WHEN `marginRequired > balance`, THE SYSTEM SHALL menampilkan peringatan margin tidak cukup.
+  WHEN `marginRequired > balance`, THE SYSTEM SHALL menampilkan peringatan margin tidak cukup (hasil tetap ditampilkan).
 
-- **FR-CALC-2 (Mode Forex & Gold) — DIPERBAIKI ke konvensi standar, lihat Asumsi #4:**
+- **FR-CALC-2 (Mode Forex & Emas) — dikoreksi v1.3:**
   ```
+  contractSize      = ukuran kontrak per 1 lot standar
+                      preset Forex = 100000 unit, preset Emas (XAUUSD) = 100 oz; bisa diedit (> 0)
   positionSizeUnits = riskAmount / distance
-  lotStandard       = positionSizeUnits / 100000   // 1 lot standar = 100.000 unit
-  lotMini           = positionSizeUnits / 10000    // 1 lot mini    = 10.000 unit
-  lotMicro          = positionSizeUnits / 1000     // 1 lot mikro   = 1.000 unit
+  lotStandard       = positionSizeUnits / contractSize
+  lotMini           = lotStandard × 10
+  lotMicro          = lotStandard × 100
   ```
-  ⚠️ Ini mengubah **ketiga** angka lot (bukan cuma mikro) dibanding versi lama, karena formula lama tidak konsisten dengan konvensi ini. Hasil kalkulator mode ini akan berbeda dari aplikasi lama — sesuai instruksi Anda untuk diperbaiki, bukan penyimpangan baru yang tidak disengaja.
+  - Preset default: Forex. Memilih preset mengisi `contractSize`; mengedit `contractSize` manual mengubah preset menjadi "Kustom".
+  - THE SYSTEM SHALL menampilkan catatan: perhitungan hanya akurat untuk instrumen yang **mata uang kutipannya USD** (mis. EURUSD, GBPUSD, AUDUSD, NZDUSD, XAUUSD), dan ukuran kontrak berbeda antar broker (cek *Specification* simbol di MetaTrader).
+  - Alasan koreksi: aplikasi lama memakai `/100` (benar untuk emas, salah untuk forex), sedangkan v1.2 memakai `/100000` (benar untuk forex, salah ×1000 untuk emas). Satu konstanta tidak bisa benar untuk keduanya.
 
 - **FR-CALC-3 (Mode Saham):**
   ```
-  shares     = floor(riskAmount / distance)
+  rawShares  = riskAmount / distance
+  shares     = floor(rawShares × (1 + 1e-9))   // toleransi galat floating-point
   totalValue = shares × entryPrice
   ```
+  Tanpa toleransi, saldo 1000, risiko 1%, entry 100.2, SL 100.1 menghasilkan `rawShares = 99.99999999999147` sehingga `floor` memberi 99 (seharusnya 100). WHEN `shares = 0`, THE SYSTEM SHALL menampilkan pesan bahwa risiko terlalu kecil untuk 1 lembar.
 
-- **FR-CALC-4:** IF `entryPrice` kosong ATAU `stopLossPrice` kosong ATAU `entryPrice == stopLossPrice`, THEN THE SYSTEM SHALL menampilkan pesan error dan tidak menghitung.
+- **FR-CALC-4 (Validasi):** saldo > 0; 0 < risiko % ≤ 100; entry > 0; SL > 0; entry ≠ SL; TP opsional, jika diisi > 0; leverage ≥ 1 (Crypto); `contractSize` > 0 (Forex & Emas); semua angka finite dan |nilai| ≤ 1e12. Field wajib yang masih **kosong** ditampilkan sebagai petunjuk netral ("isi saldo, risiko, entry, dan SL"); field yang **terisi tetapi tidak valid** ditampilkan sebagai error per field. Selama tidak valid, hasil tidak dihitung dan tidak terjadi crash.
+
+- **FR-CALC-5 (Tampilan angka):** lewat `Intl.NumberFormat` sesuai bahasa aktif — uang 2 desimal (USD), lot 4 desimal, jumlah koin maks. 8 desimal, persen 2 desimal, unit maks. 4 desimal, lembar bilangan bulat, RR `1 : X.XX`.
+
+- **FR-CALC-6 (Saldo awal):** field saldo diisi dari `user_settings.balance` satu kali setelah termuat, hanya jika field belum disentuh pengguna. Nilai di kalkulator adalah simulasi lokal dan tidak pernah ditulis balik.
+
+- **FR-CALC-7 (Golden test vectors — wajib lolos sebagai unit test dan uji manual):**
+
+  | ID | Mode | Saldo, risiko %, entry, SL, TP, lain | Hasil |
+  |---|---|---|---|
+  | V1 | Crypto | 10000, 1, 100, 98, TP 106, leverage 10 | risiko 100; jarak 2,00%; notional 5000; koin 50; margin 500; tanpa peringatan; RR 3 |
+  | V2 | Crypto | 1000, 2, 60000, 59700, tanpa TP, leverage 2 | risiko 20; jarak 0,50%; notional 4000; koin 0,06666667; margin 2000; **peringatan margin**; RR null |
+  | V3 | Crypto (short) | 10000, 1, 98, 100, TP 92, leverage 10 | jarak 2,04%; notional 4900; koin 50; margin 490; RR 3 |
+  | V4 | Forex (100000) | 5000, 2, 1.1000, 1.0950, TP 1.1100 | unit ≈ 20000; lot 0,2000; mini 2,0000; mikro 20,0000; RR 2 |
+  | V5 | Emas (100) | 5000, 1, 2350, 2340, TP 2380 | unit 5; lot 0,0500; mini 0,5000; mikro 5,0000; RR 3 |
+  | V6 | Saham | 10000, 1, 50, 48 | 50 lembar; nilai 2500 |
+  | V7 | Saham | 1000, 1, 100.2, 100.1 | **100 lembar** (bukan 99); nilai 10020 |
+  | V8 | Saham | 100, 1, 50, 48 | 0 lembar + pesan risiko terlalu kecil |
+  | V9 | Forex, kustom 5000 | 5000, 1, 30, 29.5 | unit 100; lot 0,0200; mini 0,2000; mikro 2,0000 |
+  | E1 | semua | entry = SL | error di field SL |
+  | E2 | semua | entry kosong | petunjuk netral, tanpa hasil |
+  | E3 | semua | risiko 0 atau 150 | error di field risiko |
+  | E4 | Crypto | leverage 0.5 | error di field leverage |
+  | E5 | Forex & Emas | ukuran kontrak 0 | error di field ukuran kontrak |
+
+  Ditambah tes invarian (input acak ber-seed): `koin × jarak ≈ risiko`, `margin × leverage ≈ notional`, `lot × contractSize ≈ unit`, `mini = 10 × lot`, `mikro = 100 × lot`, `lembar × jarak ≤ risiko < (lembar + 1) × jarak` (toleransi relatif 1e-9).
 
 ### 3.4 Jurnal Trading
 
@@ -120,6 +153,7 @@ rrRatio    = |takeProfitPrice − entryPrice| / distance   (ditampilkan "1 : X.X
   // Sell: R = (entryPrice − exitPrice) / (slPrice − entryPrice)
   ```
   ✅ Formula ini dirancang khusus untuk Analytics (data lama tidak menyimpan R-multiple realisasi) dan sudah dikonfirmasi dipakai apa adanya.
+  Trade yang tidak punya `slPrice` atau `exitPrice`, atau yang jarak risikonya ≤ 0 (entry sama dengan SL, atau SL berada di sisi yang salah dari entry untuk arah trade, mis. SL yang sudah digeser melewati entry), SHALL dikecualikan dari histogram ini (tidak menghasilkan `NaN`/error); trade tersebut tetap dihitung di Equity Curve dan Skor Disiplin.
 - **FR-ANA-3 (Skor Disiplin — dipindah dari Dashboard):** THE SYSTEM SHALL menampilkan ring gauge dengan formula identik versi lama:
   ```
   disciplinePct = round((jumlah trade status='plan' / total trade) × 100)
@@ -168,7 +202,7 @@ Seluruh item di bawah sudah dikonfirmasi Anda — dicatat sebagai jejak keputusa
 1. ✅ **Isi Dashboard pengganti ring disiplin** (FR-DASH-3, FR-DASH-4): preview mini kalender bulan berjalan + daftar 5 trade terakhir.
 2. ✅ **Gaya warna Kalender** (FR-CAL-1): gradasi intensitas warna berdasarkan besaran P&L (bukan biner hijau/merah).
 3. ✅ **Filter rentang tanggal di Analytics**: ditunda ke **v2**, di luar scope rilis pertama (deadline 1 bulan).
-4. ✅ **Formula "lot mikro"** (FR-CALC-2): diperbaiki ke konvensi forex standar — lihat formula final di FR-CALC-2.
+4. ✅ **Konvensi lot** (FR-CALC-2), **direvisi v1.3**: preset Forex (100.000 unit) / Emas XAUUSD (100 oz) dengan ukuran kontrak yang bisa diedit. Menggantikan keputusan sebelumnya (forex 100.000 saja) yang salah ×1000 untuk emas.
 5. ✅ **Tipe data tanggal** (FR-JOURNAL-2): `trade_date` jadi kolom `date` asli, bukan string hasil `toLocaleDateString()`.
 6. ✅ **Formula R-multiple di Analytics** (FR-ANA-2): dikonfirmasi dipakai sesuai rancangan.
 7. ✅ **Tagline**: "Disiplin di atas Prediksi" tetap dipakai di bawah nama baru "Trading Compass".
@@ -179,7 +213,7 @@ Seluruh item di bawah sudah dikonfirmasi Anda — dicatat sebagai jejak keputusa
 ## 6. Definition of Done
 
 - [ ] Semua FR di atas terimplementasi dan lolos verifikasi manual
-- [ ] Hasil Kalkulator (3 mode) diuji dengan minimal 5 skenario input dan menghasilkan angka identik dengan versi lama
+- [ ] Kalkulator lolos seluruh golden test vectors FR-CALC-7 (V1–V9, E1–E5) dan tes invarian, sebagai unit test maupun uji manual di UI
 - [ ] RLS diverifikasi: satu akun tidak bisa melihat/mengubah data akun lain
 - [ ] Responsif diverifikasi di breakpoint desktop, tablet, dan mobile
 - [ ] Kedua bahasa (ID/EN) lengkap tanpa key terjemahan yang hilang
