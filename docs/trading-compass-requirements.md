@@ -1,6 +1,6 @@
 # Trading Compass — Requirements Specification
 
-**Versi:** 1.5 — Kalender: perilaku modal (FR-CAL-2), definisi ringkasan bulanan (FR-CAL-4), navigasi dan golden vectors (FR-CAL-7); melengkapi v1.4 (Dashboard, aturan kalender bersama) dan v1.3 (FR-CALC).
+**Versi:** 1.6 — Analytics: equity curve harian, bin histogram R-multiple, ambang skor disiplin, state kosong, golden vectors (FR-ANA-1..5); melengkapi v1.5 (Kalender), v1.4 (Dashboard), dan v1.3 (FR-CALC).
 **Status:** Siap dipakai sebagai spec definitif untuk mulai development.
 **Sumber:** Diturunkan dari aplikasi lama `journal-trading-x1-supabase.html` (dianalisis langsung dari kode) + keputusan scope hasil diskusi. Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -192,20 +192,38 @@ Input yang sama dipakai bersama oleh ketiga mode (saldo, risiko %, entry, SL, TP
 
 ### 3.6 Analytics (BARU)
 
-- **FR-ANA-1 (Equity Curve):** THE SYSTEM SHALL menampilkan grafik garis P&L kumulatif, diurutkan berdasarkan `trade_date`.
-- **FR-ANA-2 (Distribusi R:R):** THE SYSTEM SHALL menampilkan grafik batang/histogram dari R-multiple realisasi tiap trade, dihitung sebagai:
+Analytics memakai data yang sama dengan Jurnal (`JournalContext`), seluruh riwayat (filter tanggal = v2). Logika di `src/lib/analyticsCalculations.js` (murni, tidak pernah throw). Halaman dimuat secara *lazy* (code-splitting) agar library chart tidak membebani muatan awal aplikasi.
+
+- **FR-ANA-1 (Equity Curve):** satu titik per **hari trading**: P&L harian dijumlahkan (pakai `groupDailyPnl` dari FR-CAL-6), diurutkan naik berdasarkan string `trade_date`, lalu dijumlah kumulatif. Sumbu X = tanggal, sumbu Y = P&L kumulatif. Tersedia ringkasan teks (P&L akhir, jumlah hari) untuk pembaca layar.
+- **FR-ANA-2 (Distribusi R-multiple):** R per trade:
   ```
-  // Buy:  R = (exitPrice − entryPrice) / (entryPrice − slPrice)
-  // Sell: R = (entryPrice − exitPrice) / (slPrice − entryPrice)
+  Buy:  risk = entry − sl ;  R = (exit − entry) / risk
+  Sell: risk = sl − entry ;  R = (entry − exit) / risk
+  Dikecualikan jika sl atau exit kosong, atau risk ≤ 0 (entry = SL, atau SL di sisi yang salah dari entry).
+  Bin  = clamp(Math.round(R), −3, 5); hasil −0 dinormalkan menjadi 0.
+         Label: "≤ −3R", "−2R", "−1R", "0R", "1R", "2R", "3R", "4R", "≥ 5R" (9 bin, selalu tampil walau 0).
   ```
-  ✅ Formula ini dirancang khusus untuk Analytics (data lama tidak menyimpan R-multiple realisasi) dan sudah dikonfirmasi dipakai apa adanya.
-  Trade yang tidak punya `slPrice` atau `exitPrice`, atau yang jarak risikonya ≤ 0 (entry sama dengan SL, atau SL berada di sisi yang salah dari entry untuk arah trade, mis. SL yang sudah digeser melewati entry), SHALL dikecualikan dari histogram ini (tidak menghasilkan `NaN`/error); trade tersebut tetap dihitung di Equity Curve dan Skor Disiplin.
-- **FR-ANA-3 (Skor Disiplin — dipindah dari Dashboard):** THE SYSTEM SHALL menampilkan ring gauge dengan formula identik versi lama:
+  Pembulatan ke bilangan bulat terdekat membuat galat floating-point (mis. R = 1,9999999999999556) tetap masuk bin "2R". `Math.round` membulatkan .5 ke atas (2,5 → 3; −1,5 → −1). THE SYSTEM SHALL menampilkan jumlah trade yang dikecualikan beserta alasannya secara singkat. Trade yang dikecualikan tetap dihitung di Equity Curve dan Skor Disiplin.
+- **FR-ANA-3 (Skor Disiplin — dipindah dari Dashboard):** ring gauge dengan formula identik versi lama:
   ```
-  disciplinePct = round((jumlah trade status='plan' / total trade) × 100)
-  warna: ≥70% hijau sage · ≥40% ungu aksen · <40% merah brick
+  disciplinePct = round((jumlah trade status='plan' / total trade) × 100)   (null jika total 0)
+  warna: ≥ 70 sage · ≥ 40 ungu aksen · < 40 brick   (ambang inklusif: 70 = sage, 40 = aksen)
   ```
-- **FR-ANA-4:** IF total trade = 0, THEN seluruh chart Analytics SHALL menampilkan empty state yang informatif (bukan grafik kosong/error).
+  Angka persen selalu tampil sebagai teks (warna bukan satu-satunya penanda).
+- **FR-ANA-4 (State kosong):** jika total trade = 0, setiap kartu menampilkan state kosong yang informatif. Jika ada trade tetapi semuanya dikecualikan dari FR-ANA-2, kartu histogram menampilkan state kosong khusus ("belum ada trade dengan SL dan exit lengkap").
+- **FR-ANA-5 (Golden test vectors):**
+
+  | ID | Data | Hasil |
+  |---|---|---|
+  | R1 / R2 | buy 100 / SL 95 / exit 110 · sell 100 / SL 105 / exit 90 | R 2 → bin "2R" (keduanya) |
+  | R3 | buy 100 / 95 / 95 | R −1 → "−1R" |
+  | R4 | buy 1.1 / 1.095 / 1.11 | R ≈ 1,9999999999999556 → "2R" |
+  | R5 / R6 | buy 100 / 95 / 112.5 · buy 100 / 95 / 92.5 | R 2,5 → "3R" · R −1,5 → "−1R" |
+  | R7 / R8 | buy 100 / 95 / 130 · buy 100 / 95 / 80 | R 6 → "≥ 5R" · R −4 → "≤ −3R" |
+  | R9–R12 | exit kosong · buy dengan SL 101 · sell dengan SL 99 · entry = SL | dikecualikan (4 kasus) |
+  | R13 | buy 100 / 95 / 97.5 | R −0,5 → "0R" (bukan −0) |
+  | G1–G7 | status: [P,P,R,P] · [P,R] · [P,R,R] · 7P+3R · 2P+3R · [P,P,R] · kosong | 75 sage · 50 aksen · 33 brick · 70 sage · 40 aksen · 67 aksen · null |
+  | EQ1 | data C3 (FR-CAL-6) | titik: 30 Sep 500 · 1 Okt 600 · 2 Okt 575 · 5 Okt 575 · 7 Okt 585 · 8 Okt 525 |
 
 ### 3.7 Bilingual (ID/EN)
 

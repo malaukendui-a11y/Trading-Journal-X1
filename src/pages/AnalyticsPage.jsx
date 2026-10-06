@@ -1,29 +1,38 @@
-import { Card } from '../components/ui/Card.jsx'
+import { useMemo } from 'react'
+import { AnalyticsView } from '../components/analytics/AnalyticsView.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { useJournalEntries } from '../hooks/useJournalEntries.js'
+import {
+  disciplineScore,
+  equityCurve,
+  rDistribution,
+} from '../lib/analyticsCalculations.js'
 
 export function AnalyticsPage() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const { entries, loading, error, refetch } = useJournalEntries()
+
+  // 1. Hitung Equity Curve kumulatif (FR-ANA-1)
+  const equityData = useMemo(() => equityCurve(entries), [entries])
+
+  // 2. Hitung Distribusi R-Multiple 9 bin (FR-ANA-2)
+  const rDistData = useMemo(() => rDistribution(entries), [entries])
+
+  // 3. Hitung Skor Disiplin Eksekusi (FR-ANA-3)
+  const score = useMemo(() => disciplineScore(entries), [entries])
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-150">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary">
-          {t('analytics.title')}
-        </h1>
-        <p className="font-body text-xs text-text-secondary mt-1">
-          {t('analytics.subtitle')}
-        </p>
-      </div>
-
-      <Card className="border border-line bg-bg-panel p-6">
-        <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-          <p className="text-sm text-text-secondary">
-            {t('common.moduleUpcoming')} (M7: Analytics)
-          </p>
-        </div>
-      </Card>
-    </div>
+    <AnalyticsView
+      loading={loading}
+      error={error}
+      onRetry={refetch}
+      tradesCount={entries?.length || 0}
+      equityData={equityData}
+      rDistData={rDistData}
+      score={score}
+      t={t}
+      lang={lang}
+    />
   )
 }
 
