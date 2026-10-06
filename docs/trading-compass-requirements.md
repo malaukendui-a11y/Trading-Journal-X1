@@ -1,6 +1,6 @@
 # Trading Compass — Requirements Specification
 
-**Versi:** 1.6 — Analytics: equity curve harian, bin histogram R-multiple, ambang skor disiplin, state kosong, golden vectors (FR-ANA-1..5); melengkapi v1.5 (Kalender), v1.4 (Dashboard), dan v1.3 (FR-CALC).
+**Versi:** 1.7 — Rilis publik: kebijakan password (FR-AUTH-2), redirect konfirmasi email (FR-AUTH-6), target performa/aksesibilitas, konfigurasi produksi (§4.1); melengkapi v1.6 (Analytics) dan versi sebelumnya.
 **Status:** Siap dipakai sebagai spec definitif untuk mulai development.
 **Sumber:** Diturunkan dari aplikasi lama `journal-trading-x1-supabase.html` (dianalisis langsung dari kode) + keputusan scope hasil diskusi. Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -10,7 +10,7 @@
 
 **Trading Compass** (sebelumnya "Ledger — Disiplin di atas Prediksi") adalah personal trading discipline dashboard yang membantu trader menghitung risiko sebelum entry, mencatat setiap trade, dan mengevaluasi kedisiplinan eksekusi dari waktu ke waktu — dibangun ulang dari single-file HTML menjadi aplikasi React profesional dengan bahasa visual terinspirasi CoinMarketCap.
 
-- **Target pengguna:** Kenny sendiri (personal use), sekaligus berfungsi sebagai portofolio teknis (skill: React, Supabase, product design).
+- **Target pengguna:** publik — siapa pun boleh mendaftar (keputusan rilis v1.7), dengan konfirmasi email aktif; sekaligus portofolio teknis (skill: React, Supabase, product design).
 - **Nilai inti yang dipertahankan:** disiplin eksekusi di atas prediksi arah pasar — tercermin dari fitur skor disiplin & analitik plan-vs-revenge.
 - **Arah visual:** simple, minimalis, fungsi di atas segalanya — inspirasi CoinMarketCap dipakai secukupnya (kejelasan tipografi & disiplin warna), bukan kepadatan visualnya. Identitas warna violet/ungu dipertahankan, dukungan tema light/dark, dan logo mark orisinal (lihat 3.9).
 
@@ -47,9 +47,10 @@ Format: **EARS** (WHEN/IF/THE SYSTEM SHALL) — format yang sama dipakai Kiro un
 ### 3.1 Autentikasi
 
 - **FR-AUTH-1:** WHEN pengguna submit email & password valid pada form login, THE SYSTEM SHALL mengautentikasi via Supabase Auth dan mengarahkan ke Dashboard.
-- **FR-AUTH-2:** WHEN pengguna submit form registrasi dengan email unik dan password ≥ 6 karakter, THE SYSTEM SHALL membuat akun baru di Supabase Auth.
+- **FR-AUTH-2:** WHEN pengguna submit form registrasi dengan email unik dan password yang memenuhi **kebijakan password** (minimal 8 karakter, mengandung huruf kecil, huruf besar, dan angka), THE SYSTEM SHALL membuat akun baru di Supabase Auth. Validasi di client harus identik dengan pengaturan Supabase Auth (Minimum password length = 8; Password requirements = lowercase, uppercase letters and digits).
 - **FR-AUTH-3:** WHEN pengguna meminta reset password, THE SYSTEM SHALL mengirim link reset via Supabase Auth.
-- **FR-AUTH-3b:** WHEN pengguna membuka link reset dari email, THE SYSTEM SHALL menampilkan halaman `/reset-password` berisi form password baru (≥ 6 karakter, dengan konfirmasi), menyimpannya via Supabase Auth, lalu mengarahkan ke Dashboard. (Tanpa halaman ini link reset tidak berguna.)
+- **FR-AUTH-6:** `signUp` mengirim `emailRedirectTo = ${window.location.origin}/` sehingga link konfirmasi email kembali ke domain tempat pengguna mendaftar (lokal maupun produksi). Jika sesi tidak langsung tersedia (konfirmasi email aktif), tampil pesan "cek email Anda" (sudah ada sejak M1).
+- **FR-AUTH-3b:** WHEN pengguna membuka link reset dari email, THE SYSTEM SHALL menampilkan halaman `/reset-password` berisi form password baru (kebijakan password yang sama dengan FR-AUTH-2, dengan konfirmasi), menyimpannya via Supabase Auth, lalu mengarahkan ke Dashboard. (Tanpa halaman ini link reset tidak berguna.)
 - **FR-AUTH-4:** IF sesi login valid masih ada, THEN THE SYSTEM SHALL memulihkan sesi otomatis saat halaman dimuat ulang.
 - **FR-AUTH-5:** WHEN pengguna logout, THE SYSTEM SHALL menghapus sesi dan kembali ke layar Auth.
 
@@ -249,15 +250,26 @@ Analytics memakai data yang sama dengan Jurnal (`JournalContext`), seluruh riway
 
 | Kategori | Kebutuhan |
 |---|---|
-| Performa | Interaksi utama (ganti tab, hitung kalkulator) terasa instan (<100ms); load awal wajar untuk SPA ringan |
+| Performa | Interaksi utama (ganti tab, hitung kalkulator) terasa instan (<100ms). Semua halaman terproteksi dimuat secara lazy; chunk JS utama < 500 kB (tanpa peringatan ukuran chunk dari Vite). Lighthouse (build produksi, mode desktop): Performance ≥ 90 |
 | Responsif | Desktop-first (breakpoint utama ≥1280px), tetap dapat dipakai di tablet/mobile |
-| Aksesibilitas | Kontras warna teks minimal WCAG AA di kedua tema; seluruh form bisa dioperasikan via keyboard |
+| Aksesibilitas | Kontras warna teks minimal WCAG AA (4,5:1) di kedua tema memakai token di design.md §5.1 (sudah dihitung); seluruh form bisa dioperasikan via keyboard. Lighthouse Accessibility ≥ 95 |
 | Kompatibilitas browser | Chrome, Firefox, Edge, Safari versi terbaru |
-| Keamanan | RLS wajib aktif di semua tabel; kredensial Supabase sebagai environment variable (tidak di-hardcode); security headers (CSP, X-Frame-Options) di `vercel.json`; validasi input sebelum kirim ke Supabase; error Supabase tidak pernah ditampilkan mentah ke UI |
+| Keamanan | RLS wajib aktif di semua tabel; kredensial Supabase sebagai environment variable (tidak di-hardcode); security headers sesuai design.md §8.1 di `vercel.json` (sumber tunggal: `security-headers.json`); validasi input sebelum kirim ke Supabase; error Supabase tidak pernah ditampilkan mentah ke UI; kebijakan password FR-AUTH-2 |
 | Kualitas kode | Komponen reusable (Button, Card, Tag, dsb.), logika kalkulasi dipisah dari UI agar mudah di-unit-test |
 | Deployment | Build otomatis dari GitHub ke Vercel |
 
 ---
+
+### 4.1 Konfigurasi produksi (dikerjakan manual di dashboard, bukan oleh agent)
+
+| Tempat | Pengaturan |
+|---|---|
+| Supabase → Authentication → Sign In / Providers → Email | Confirm email **ON**; Minimum password length **8**; Password requirements **lowercase, uppercase letters and digits** |
+| Supabase → Authentication → Emails → SMTP Settings | SMTP kustom aktif (layanan bawaan hanya untuk development, batas kirimnya sangat kecil) |
+| Supabase → Authentication → URL Configuration | Site URL = URL produksi; Redirect URLs = `https://<domain-produksi>/**` dan `http://localhost:5173/**` |
+| Vercel → Project → Settings → Environment Variables | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (Production + Preview) |
+
+Catatan: peringatan Security Advisor "Leaked Password Protection Disabled" tidak bisa ditindaklanjuti di paket Free (fitur ini khusus Pro ke atas) dan diterima sebagai risiko yang diketahui. CAPTCHA untuk pendaftaran ditunda ke v2.
 
 ## 5. Keputusan Final (sebelumnya "Asumsi & Item Terbuka")
 

@@ -1,6 +1,6 @@
 # Trading Compass — Technical Design Document
 
-**Versi:** 1.2 — final. Seluruh pilihan teknis (§2, §9) sudah dikonfirmasi Anda.
+**Versi:** 1.3 — token warna final hasil audit kontras WCAG (§5.1) dan spesifikasi header keamanan (§8.1) untuk rilis publik.
 **Pasangan dokumen:** `trading-compass-requirements.md`
 **Catatan:** Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -51,7 +51,8 @@ trading-compass/
 │  ├─ context/
 │  │  ├─ AuthContext.jsx
 │  │  ├─ ThemeContext.jsx
-│  │  └─ LanguageContext.jsx
+│  │  ├─ LanguageContext.jsx
+│  │  └─ JournalContext.jsx     # data jurnal dimuat sekali, dipakai bersama Jurnal/Dashboard/Kalender/Analytics
 │  ├─ hooks/
 │  │  ├─ useJournalEntries.js
 │  │  └─ useUserSettings.js
@@ -127,22 +128,29 @@ create policy "user_settings_owner_access"
 
 Inspirasi CoinMarketCap dipakai secukupnya — kejelasan tipografi dan disiplin warna status — bukan kepadatan visualnya, sesuai arah simple & fungsional. Identitas violet dari versi lama dipertahankan.
 
-### 5.1 Warna — dipertahankan dari versi lama, dipetakan ke dua tema
+### 5.1 Warna — final setelah audit kontras WCAG (M8)
 
-| Token | Dark (existing, dipertahankan) | Light (BARU) ⚠️ ASUMSI |
-|---|---|---|
-| `--bg` | `#10151b` | `#f7f8fa` |
-| `--bg-panel` | `#161d25` | `#ffffff` |
-| `--bg-panel-raised` | `#1c242e` | `#f0f1f4` |
-| `--line` | `#2a333d` | `#e3e5e9` |
-| `--text-primary` | `#e9e4d8` | `#151823` |
-| `--text-secondary` | `#a9a89e` | `#6b7280` |
-| `--accent` | `#9179d6` | `#9179d6` (tetap sama di kedua tema) |
-| `--accent-soft` | `rgba(145,121,214,0.12)` | `rgba(145,121,214,0.10)` |
-| `--sage` (profit) | `#7fa387` | `#1f9d55` |
-| `--brick` (loss) | `#b1594a` | `#d92d20` |
+| Token | Dark | Light | Dipakai untuk |
+|---|---|---|---|
+| `--bg` | `#10151b` | `#f7f8fa` | latar halaman |
+| `--bg-panel` | `#161d25` | `#ffffff` | kartu/panel |
+| `--bg-panel-raised` | `#1c242e` | `#f0f1f4` | elemen terangkat |
+| `--line` | `#2a333d` | `#e3e5e9` | garis/border |
+| `--text-primary` | `#e9e4d8` | `#151823` | teks utama |
+| `--text-secondary` | `#a9a89e` | `#6b7280` | teks sekunder |
+| `--accent` | `#9179d6` | `#9179d6` | logo, border, ring fokus, dekorasi (bukan teks di tema terang) |
+| `--accent-text` **(baru)** | `#9179d6` | `#6d55b8` | teks/tautan berwarna aksen |
+| `--accent-solid` **(baru)** | `#6d55b8` | `#6d55b8` | latar tombol utama (teks putih) |
+| `--accent-soft` | `rgba(145,121,214,0.12)` | `rgba(145,121,214,0.10)` | latar lembut (menu aktif) |
+| `--sage` (profit) | `#7fa387` | `#177245` *(sebelumnya `#1f9d55`)* | teks/angka profit |
+| `--brick` (loss) | `#d9786a` *(sebelumnya `#b1594a`)* | `#d92d20` | teks/angka loss |
 
-**Implementasi di Tailwind v4:** token yang beda nilai per tema (`--bg`, `--text-primary`, dst.) didefinisikan sebagai CSS variable biasa — `:root { }` untuk light (default), `.dark { }` untuk override dark — lalu dirujuk di `@theme` dengan `--color-bg: var(--bg);` supaya Tailwind tetap menghasilkan utility class (`bg-bg`, `text-text-primary`) yang otomatis ikut berubah saat class `.dark` di-toggle. Token yang tidak berubah antar-tema (`--accent`, `--sage`, `--brick`) langsung didefinisikan sebagai nilai tetap di `@theme`.
+**Hasil audit kontras (rasio terhadap `--bg` / `--bg-panel`; AA teks normal ≥ 4,5):**
+- Gagal sebelum M8: aksen `#9179d6` di tema terang 3,34 / 3,55; sage `#1f9d55` di tema terang 3,29 / 3,49; brick `#b1594a` di tema gelap 3,84 / 3,56; teks putih di tombol `#9179d6` 3,55.
+- Setelah perbaikan: `--accent-text` terang `#6d55b8` 5,43 / 5,77; sage terang `#177245` 5,60 / 5,95; brick gelap `#d9786a` 5,98 / 5,54; teks putih di `--accent-solid` 5,77; aksen gelap `#9179d6` 5,16 / 4,78; brick terang `#d92d20` 4,55 / 4,83.
+- Warna sel heatmap kalender adalah grafis (bukan teks) dan tidak diubah. Logo tetap memakai `#9179d6` dan `#5f4f96`.
+
+**Implementasi di Tailwind v4:** token yang beda nilai per tema (`--bg`, `--text-primary`, dst.) didefinisikan sebagai CSS variable biasa — `:root { }` untuk light (default), `.dark { }` untuk override dark — lalu dirujuk di `@theme` dengan `--color-bg: var(--bg);` supaya Tailwind tetap menghasilkan utility class (`bg-bg`, `text-text-primary`) yang otomatis ikut berubah saat class `.dark` di-toggle. Sejak M8, `--sage`, `--brick`, dan `--accent-text` berbeda antar-tema, sehingga ikut didefinisikan di `:root`/`.dark` lalu dirujuk dari `@theme`.
 
 ### 5.2 Tipografi — dipertahankan (sudah cukup selaras dengan gaya data-app)
 
@@ -196,8 +204,15 @@ Agregasi dilakukan di client (bukan Postgres view/function) — cukup untuk volu
 ### 6.2 Alur Tambah Trade (Journal)
 
 1. User isi form → validasi field wajib (instrumen, P&L, status).
-2. Insert ke `journal_entries` dengan `trade_date = new Date()` (tipe `date` asli, bukan string berbahasa).
-3. Refresh state lokal (`useJournalEntries`) → otomatis memicu re-render Dashboard, Kalender, dan Analytics tanpa perlu reload.
+2. Insert ke `journal_entries` dengan `trade_date` dari input date picker (format `YYYY-MM-DD`, tipe `date` asli, bukan string berbahasa). Default nilai picker = hari ini, tetapi bisa diedit agar trade lampau bisa dicatat.
+3. Refresh state bersama (`JournalContext`, dibaca lewat `useJournalEntries`) → otomatis memicu re-render Dashboard, Kalender, dan Analytics tanpa perlu reload. Data dimuat dengan paging `.range()` sampai habis (batas default Supabase 1000 baris per request).
+
+### 6.3 Pembuatan `user_settings` (tanpa trigger database)
+
+Skema §4.2 tidak memakai trigger Postgres. Saat login/sesi pertama, aplikasi melakukan **upsert** baris default ke `user_settings` (`user_id = auth.uid()`; `balance=0`, `lang='id'`, `theme='dark'`) sebelum membaca preferensi. Dengan begitu user baru tidak pernah punya baris kosong, dan tidak perlu migrasi SQL tambahan.
+
+### 6.4 Saldo akun
+Input saldo di Dashboard bersifat inline dan tersimpan ke `user_settings.balance` saat `onBlur`. Kalkulator memakai nilai itu sebagai default, tetapi isian saldo di Kalkulator hanya simulasi lokal dan tidak menimpa saldo tersimpan.
 
 ## 7. Theming & i18n
 
@@ -212,11 +227,21 @@ Agregasi dilakukan di client (bukan Postgres view/function) — cukup untuk volu
 4. Update **Site URL** & **Redirect URL** di Supabase Auth settings ke domain Vercel (dan domain custom nanti setelah Anda beli).
 5. Deploy → smoke test alur auth → register → login → tambah trade → cek Kalender & Analytics terisi benar.
 
-### 8.1 Keamanan Runtime (tambahan)
+### 8.1 Keamanan Runtime
 
-- Security headers di `vercel.json`: `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`.
-- Validasi input di sisi client (tipe angka, field wajib) sebelum request ke Supabase — mengurangi request invalid, bukan pengganti RLS.
-- Error dari Supabase (`error.message` mentah) tidak pernah ditampilkan langsung ke UI — mapping ke pesan generik yang aman.
+- **Sumber tunggal header:** `security-headers.json` di root project. Isinya dipakai oleh `vite.config.js` (`preview.headers`, supaya CSP bisa diuji lokal dengan `npm run preview`) dan disalin persis ke `vercel.json` (`headers` untuk `/(.*)`). Tes Vitest memastikan keduanya identik.
+- **Header:**
+  ```
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://<project-ref>.supabase.co wss://<project-ref>.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  ```
+  `'unsafe-inline'` hanya untuk `style-src` (atribut `style` dari React dan Recharts); `script-src` tetap `'self'`, sehingga `dist/index.html` tidak boleh berisi `<script>` inline (karena itu `theme-init.js` berupa file eksternal).
+- **SPA rewrite** di `vercel.json`: semua path selain file statis diarahkan ke `/index.html`.
+- Validasi input di client sebelum request ke Supabase (bukan pengganti RLS); error Supabase dipetakan ke pesan generik; detail hanya lewat `logDevError` di mode development.
+- Setelah deploy baru, tab lama yang meminta chunk lazy versi lama akan gagal memuat; ErrorBoundary menampilkan pesan dengan tombol muat ulang.
 
 ## 9. Keputusan Teknis — Final
 
