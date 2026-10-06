@@ -16,13 +16,59 @@ export function validateEmail(email) {
 }
 
 /**
- * Validasi panjang password (minimal 6 karakter sesuai requirements).
+ * Validasi password non-kosong untuk form login.
+ * Akun lama dengan password apa pun tetap dapat login tanpa terhalang kebijakan baru.
+ * @param {string} password
+ * @returns {boolean}
+ */
+export function validateLoginPassword(password) {
+  if (!password || typeof password !== 'string') return false
+  return password.length > 0
+}
+
+/**
+ * Mengecek rincian syarat kebijakan password FR-AUTH-2:
+ * Minimal 8 karakter, huruf kecil, huruf besar, dan angka.
+ * @param {string} password
+ * @returns {{ minLength: boolean, hasLower: boolean, hasUpper: boolean, hasDigit: boolean, valid: boolean }}
+ */
+export function checkPasswordPolicy(password) {
+  const p = typeof password === 'string' ? password : ''
+  const minLength = p.length >= 8
+  const hasLower = /[a-z]/.test(p)
+  const hasUpper = /[A-Z]/.test(p)
+  const hasDigit = /[0-9]/.test(p)
+  return {
+    minLength,
+    hasLower,
+    hasUpper,
+    hasDigit,
+    valid: minLength && hasLower && hasUpper && hasDigit,
+  }
+}
+
+/**
+ * Mendapatkan kunci error i18n untuk syarat kebijakan password yang gagal dipenuhi.
+ * @param {string} password
+ * @returns {string|null}
+ */
+export function getPasswordPolicyErrorKey(password) {
+  const policy = checkPasswordPolicy(password)
+  if (!policy.minLength) return 'auth.passwordMinLength'
+  if (!policy.hasLower) return 'auth.passwordNeedLower'
+  if (!policy.hasUpper) return 'auth.passwordNeedUpper'
+  if (!policy.hasDigit) return 'auth.passwordNeedDigit'
+  return null
+}
+
+/**
+ * Validasi kebijakan password baru (FR-AUTH-2) untuk pendaftaran & reset password.
+ * Minimal 8 karakter, mengandung huruf kecil, huruf besar, dan angka.
  * @param {string} password
  * @returns {boolean}
  */
 export function validatePassword(password) {
-  if (!password || typeof password !== 'string') return false
-  return password.length >= 6
+  return checkPasswordPolicy(password).valid
 }
 
 /**
