@@ -58,7 +58,7 @@ export function CalculatorView({
           onClick={() => onModeChange?.('crypto')}
           className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors duration-150 flex items-center gap-2 ${
             mode === 'crypto'
-              ? 'border-accent text-accent'
+              ? 'border-accent text-accent-text'
               : 'border-transparent text-text-secondary hover:text-text-primary'
           }`}
         >
@@ -74,7 +74,7 @@ export function CalculatorView({
           onClick={() => onModeChange?.('forex')}
           className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors duration-150 flex items-center gap-2 ${
             mode === 'forex'
-              ? 'border-accent text-accent'
+              ? 'border-accent text-accent-text'
               : 'border-transparent text-text-secondary hover:text-text-primary'
           }`}
         >
@@ -90,7 +90,7 @@ export function CalculatorView({
           onClick={() => onModeChange?.('stock')}
           className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors duration-150 flex items-center gap-2 ${
             mode === 'stock'
-              ? 'border-accent text-accent'
+              ? 'border-accent text-accent-text'
               : 'border-transparent text-text-secondary hover:text-text-primary'
           }`}
         >
@@ -100,7 +100,7 @@ export function CalculatorView({
       </div>
 
       {/* Grid Formulir Input */}
-      <Card className="border border-line bg-bg-panel p-5 sm:p-6 shadow-sm">
+      <Card className="p-5 sm:p-6">
         <form
           id="panel-calculator"
           role="tabpanel"
@@ -193,10 +193,10 @@ export function CalculatorView({
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <label
                 htmlFor="input-contract-size"
-                className="text-xs font-medium text-text-secondary flex items-center justify-between"
+                className="text-[13px] font-medium text-text-secondary flex items-center justify-between"
               >
                 <span>{t('calculator.contractSize')}</span>
-                <span className="text-text-secondary/70">
+                <span className="text-text-secondary">
                   {forexPreset === 'forex'
                     ? t('calculator.presetForex')
                     : forexPreset === 'gold'
@@ -251,8 +251,8 @@ export function CalculatorView({
 
       {/* Petunjuk Netral Jika Ada Field Wajib yang Masih Kosong */}
       {isMissing && (
-        <div className="rounded-lg border border-line bg-bg-panel/70 p-4 flex items-center gap-3 text-text-secondary">
-          <Info className="w-5 h-5 shrink-0 text-accent" />
+        <div className="glass rounded-xl p-4 flex items-center gap-3 text-text-secondary">
+          <Info className="w-5 h-5 shrink-0 text-accent-text" />
           <p className="text-xs sm:text-sm">
             {mode === 'crypto'
               ? t('calculator.missingFieldsHintCrypto')
@@ -269,29 +269,29 @@ export function CalculatorView({
           <div className="space-y-5 animate-in fade-in duration-200">
             {/* Metrik Dasar: Nilai Risiko, Jarak SL, Rasio R:R */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <Card className="border border-line bg-bg-panel p-4">
-                <span className="text-xs text-text-secondary block mb-1">
+              <Card className="p-4">
+                <span className="text-[13px] font-medium text-text-secondary block mb-1">
                   {t('calculator.riskAmount')}
                 </span>
-                <span className="font-display text-xl sm:text-2xl font-bold text-brick">
+                <span className="text-2xl font-medium tabular-nums text-brick">
                   {formatCurrency(result.riskAmount, lang)}
                 </span>
               </Card>
 
-              <Card className="border border-line bg-bg-panel p-4">
-                <span className="text-xs text-text-secondary block mb-1">
+              <Card className="p-4">
+                <span className="text-[13px] font-medium text-text-secondary block mb-1">
                   {t('calculator.stopLossDistance')}
                 </span>
-                <span className="font-display text-xl sm:text-2xl font-bold text-text-primary">
+                <span className="text-2xl font-medium tabular-nums text-text-primary">
                   {formatPrice(result.distance, lang)}
                 </span>
               </Card>
 
-              <Card className="border border-line bg-bg-panel p-4">
-                <span className="text-xs text-text-secondary block mb-1">
+              <Card className="p-4">
+                <span className="text-[13px] font-medium text-text-secondary block mb-1">
                   {t('calculator.rrRatio')}
                 </span>
-                <span className="font-display text-xl sm:text-2xl font-bold text-accent">
+                <span className="text-2xl font-medium tabular-nums text-accent-text">
                   {formatRR(result.rr, lang)}
                 </span>
               </Card>
@@ -301,38 +301,38 @@ export function CalculatorView({
             {mode === 'crypto' && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.distancePercent')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-text-primary">
+                    <span className="text-xl font-medium tabular-nums text-text-primary">
                       {formatPercent(result.distancePercent, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.notionalValue')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-text-primary">
+                    <span className="text-xl font-medium tabular-nums text-text-primary">
                       {formatCurrency(result.notionalValue, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.coinSize')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-text-primary">
+                    <span className="text-xl font-medium tabular-nums text-text-primary">
                       {formatCoin(result.coinSize, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.marginRequired')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-accent">
+                    <span className="text-xl font-medium tabular-nums text-accent-text">
                       {formatCurrency(result.marginRequired, lang)}
                     </span>
                   </Card>
@@ -354,46 +354,46 @@ export function CalculatorView({
             {mode === 'forex' && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.lotStandard')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-accent">
+                    <span className="text-xl font-medium tabular-nums text-accent-text">
                       {formatLot(result.lot, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.lotMini')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-text-primary">
+                    <span className="text-xl font-medium tabular-nums text-text-primary">
                       {formatLot(result.lotMini, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.lotMicro')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-text-primary">
+                    <span className="text-xl font-medium tabular-nums text-text-primary">
                       {formatLot(result.lotMicro, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.positionUnits')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-text-primary">
+                    <span className="text-xl font-medium tabular-nums text-text-primary">
                       {formatUnits(result.positionSizeUnits, lang)}
                     </span>
                   </Card>
                 </div>
 
                 {/* Catatan Edukasi Kuotasi USD & Kontrak Broker */}
-                <div className="rounded-lg border border-line bg-bg-panel/40 p-3.5 flex items-start gap-2.5 text-text-secondary text-xs leading-relaxed">
-                  <Info className="w-4 h-4 shrink-0 text-accent mt-0.5" />
+                <div className="rounded-xl border border-line bg-bg-panel-raised p-3.5 flex items-start gap-2.5 text-text-secondary text-xs leading-relaxed">
+                  <Info className="w-4 h-4 shrink-0 text-accent-text mt-0.5" />
                   <span>{t('calculator.forexDisclaimer')}</span>
                 </div>
               </div>
@@ -402,20 +402,20 @@ export function CalculatorView({
             {mode === 'stock' && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.shares')}
                     </span>
-                    <span className="font-display text-xl sm:text-2xl font-bold text-accent">
+                    <span className="text-2xl font-medium tabular-nums text-accent-text">
                       {formatShares(result.shares, lang)}
                     </span>
                   </Card>
 
-                  <Card className="border border-line bg-bg-panel p-4">
-                    <span className="text-xs text-text-secondary block mb-1">
+                  <Card className="p-4">
+                    <span className="text-[13px] font-medium text-text-secondary block mb-1">
                       {t('calculator.totalStockValue')}
                     </span>
-                    <span className="font-display text-xl sm:text-2xl font-bold text-text-primary">
+                    <span className="text-2xl font-medium tabular-nums text-text-primary">
                       {formatCurrency(result.totalValue, lang)}
                     </span>
                   </Card>

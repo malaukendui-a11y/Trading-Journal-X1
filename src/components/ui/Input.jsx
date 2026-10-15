@@ -20,7 +20,7 @@ export function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-xs font-medium text-text-secondary flex items-center justify-between"
+          className="text-[13px] font-medium text-text-secondary flex items-center justify-between"
         >
           <span>
             {label}
@@ -40,11 +40,11 @@ export function Input({
         autoComplete={autoComplete}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
-        className={`w-full px-3.5 py-2.5 rounded-lg text-sm bg-bg-panel border transition-colors duration-150 text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-accent/30 ${
+        className={`w-full min-h-11 px-3.5 py-2.5 rounded-xl text-base md:text-[15px] bg-bg-panel-raised border transition-colors duration-150 text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-[3px] focus:ring-[rgba(145,121,214,.22)] ${
           error
             ? 'border-brick focus:border-brick'
-            : 'border-line hover:border-text-secondary/40 focus:border-accent'
-        } ${disabled ? 'opacity-50 cursor-not-allowed bg-bg-panel-raised' : ''}`}
+            : 'border-line hover:border-accent-border focus:border-accent-border'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         {...props}
       />
 

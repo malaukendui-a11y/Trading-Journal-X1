@@ -5,24 +5,24 @@ export function Tag({
   className = '',
   ...props
 }) {
-  const baseStyles = 'inline-flex items-center font-mono font-medium rounded uppercase tracking-wider'
+  const baseStyles = 'inline-flex items-center h-6 font-medium rounded-full whitespace-nowrap'
 
   const sizeStyles = {
-    xs: 'text-[10px] px-1.5 py-0.5',
-    sm: 'text-xs px-2 py-0.5',
-    md: 'text-sm px-2.5 py-1',
-  }[size] || 'text-xs px-2 py-0.5'
+    xs: 'text-[11px] px-2',
+    sm: 'text-xs px-2.5',
+    md: 'text-[13px] px-3',
+  }[size] || 'text-xs px-2.5'
 
   const variantStyles = {
-    buy: 'bg-sage/15 text-sage border border-sage/30',
-    sell: 'bg-brick/15 text-brick border border-brick/30',
-    plan: 'bg-sage/15 text-sage border border-sage/30',
-    revenge: 'bg-brick/15 text-brick border border-brick/30',
-    sage: 'bg-sage/15 text-sage border border-sage/30',
-    brick: 'bg-brick/15 text-brick border border-brick/30',
-    accent: 'bg-accent/15 text-accent border border-accent/30',
-    neutral: 'bg-bg-panel-raised text-text-secondary border border-line',
-  }[variant] || 'bg-bg-panel-raised text-text-secondary border border-line'
+    buy: 'bg-sage-soft text-sage border border-sage-border',
+    sell: 'bg-brick-soft text-brick border border-brick-border',
+    plan: 'bg-accent-soft text-accent-text border border-transparent',
+    revenge: 'bg-brick-soft text-brick border border-brick-border',
+    sage: 'bg-sage-soft text-sage border border-sage-border',
+    brick: 'bg-brick-soft text-brick border border-brick-border',
+    accent: 'bg-accent-soft text-accent-text border border-transparent',
+    neutral: 'bg-bg-panel-raised text-text-primary border border-line',
+  }[variant] || 'bg-bg-panel-raised text-text-primary border border-line'
 
   return (
     <span className={`${baseStyles} ${sizeStyles} ${variantStyles} ${className}`} {...props}>

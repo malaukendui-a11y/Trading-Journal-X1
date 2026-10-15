@@ -18,8 +18,8 @@ function ErrorFallback({ onReset }) {
       role="alert"
       className="p-4 sm:p-6 lg:p-8 flex items-center justify-center min-h-[50vh] w-full"
     >
-      <Card className="max-w-md w-full p-8 text-center border-brick/30 bg-bg-panel shadow-sm">
-        <div className="w-12 h-12 rounded-full bg-brick/10 border border-brick/30 flex items-center justify-center text-brick mx-auto mb-4">
+      <Card className="max-w-md w-full p-8 text-center border-brick-border">
+        <div className="w-12 h-12 rounded-full bg-brick-soft border border-brick-border flex items-center justify-center text-brick mx-auto mb-4">
           <AlertCircle className="w-6 h-6" />
         </div>
         <h2 className="font-display font-semibold text-lg text-text-primary mb-2">

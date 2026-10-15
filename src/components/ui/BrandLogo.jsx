@@ -23,8 +23,8 @@ export default function BrandLogo({ className = '' }) {
       </svg>
       <span
         style={{
-          fontFamily: 'var(--font-display, "Space Grotesk", sans-serif)',
-          fontWeight: 700,
+          fontFamily: 'var(--font-display, "IBM Plex Sans", system-ui, sans-serif)',
+          fontWeight: 600,
           fontSize: '1.125rem',
           color: 'var(--text-primary)',
           letterSpacing: '-0.01em',

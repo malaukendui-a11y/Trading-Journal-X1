@@ -20,15 +20,15 @@ export function EquityCurveChart({ data = [], width, height, t, lang }) {
   const finalPnl = hasData ? data[data.length - 1].value : 0
   const daysCount = hasData ? data.length : 0
 
-  // Warna garis mengikuti performa akhir kumulatif
-  const strokeColor = finalPnl >= 0 ? 'var(--color-sage, #22c55e)' : 'var(--color-brick, #ef4444)'
+  // Warna garis equity memakai aksen (design.md §5.5); nilai akhir tetap diwarnai sage/brick di tooltip
+  const strokeColor = 'var(--accent)'
 
   // Kustomisasi Tooltip agar sesuai desain Trading Compass
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const val = payload[0].value
       return (
-        <div className="rounded-lg border border-line bg-bg-panel p-2.5 shadow-md font-mono text-xs">
+        <div className="glass rounded-xl p-2.5 tabular-nums text-xs">
           <p className="text-text-secondary mb-1">
             {formatDateDisplay(label, lang)}
           </p>
@@ -48,10 +48,10 @@ export function EquityCurveChart({ data = [], width, height, t, lang }) {
       data={data}
       margin={{ top: 10, right: 15, left: 10, bottom: 5 }}
     >
-      <CartesianGrid stroke="var(--color-line, #374151)" strokeDasharray="3 3" opacity={0.4} />
+      <CartesianGrid stroke="var(--line)" strokeDasharray="3 3" />
       <XAxis
         dataKey="date"
-        stroke="var(--color-text-secondary, #9ca3af)"
+        stroke="var(--text-secondary)"
         fontSize={11}
         tickLine={false}
         tickFormatter={(val) => {
@@ -60,7 +60,7 @@ export function EquityCurveChart({ data = [], width, height, t, lang }) {
         }}
       />
       <YAxis
-        stroke="var(--color-text-secondary, #9ca3af)"
+        stroke="var(--text-secondary)"
         fontSize={11}
         tickLine={false}
         domain={['auto', 'auto']}

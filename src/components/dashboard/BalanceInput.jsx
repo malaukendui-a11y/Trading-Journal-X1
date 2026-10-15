@@ -98,12 +98,12 @@ export function BalanceInput({ balance, loading = false, onSaveBalance, t, lang 
       <div className="flex items-center gap-2">
         <label
           htmlFor="dashboard-balance-input"
-          className="text-xs font-medium text-text-secondary uppercase tracking-wider"
+          className="text-[13px] font-medium text-text-secondary"
         >
           {t('dashboard.balanceLabel')}
         </label>
         <div className="relative flex items-center">
-          <span className="absolute left-3 text-text-secondary font-mono text-sm pointer-events-none select-none">
+          <span className="absolute left-3 text-text-secondary text-sm pointer-events-none select-none">
             $
           </span>
           <input
@@ -119,10 +119,10 @@ export function BalanceInput({ balance, loading = false, onSaveBalance, t, lang 
             onKeyDown={handleKeyDown}
             aria-invalid={status === 'error'}
             aria-describedby={status === 'error' ? 'balance-error-msg' : 'balance-hint'}
-            className={`w-44 pl-7 pr-3 py-1.5 rounded-lg border text-sm font-mono transition-colors focus:outline-none focus:ring-1 ${
+            className={`w-44 min-h-11 pl-7 pr-3 py-1.5 rounded-xl border text-base md:text-[15px] tabular-nums font-medium bg-bg-panel-raised transition-colors focus:outline-none focus:ring-[3px] focus:ring-[rgba(145,121,214,.22)] ${
               status === 'error'
-                ? 'border-brick text-brick focus:ring-brick bg-brick/5'
-                : 'border-line text-text-primary bg-bg-panel hover:border-line/80 focus:border-accent focus:ring-accent'
+                ? 'border-brick text-brick focus:border-brick'
+                : 'border-line text-text-primary hover:border-accent-border focus:border-accent-border'
             } ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
           />
         </div>

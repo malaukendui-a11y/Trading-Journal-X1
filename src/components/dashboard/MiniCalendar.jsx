@@ -35,17 +35,17 @@ export function MiniCalendar({ grid, dailyPnl = {}, maxAbs = 0, year, month, t, 
     <Link
       to="/calendar"
       aria-label={t('dashboard.miniCalendarAria')}
-      className="block group rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="block group rounded-[20px] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
-      <Card className="p-5 border border-line bg-bg-panel transition-all group-hover:border-accent/50 group-hover:shadow-sm">
+      <Card className="p-5 transition-all group-hover:border-accent-border">
         {/* Header Kartu */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-semibold text-text-primary font-display group-hover:text-accent transition-colors">
+            <h2 className="text-lg font-semibold text-text-primary font-display group-hover:text-accent-text transition-colors">
               {t('dashboard.miniCalendarTitle')}
             </h2>
           </div>
-          <span className="text-xs font-medium text-accent flex items-center gap-1 group-hover:underline">
+          <span className="text-xs font-medium text-accent-text flex items-center gap-1 group-hover:underline">
             {t('dashboard.viewFullCalendar')}
           </span>
         </div>
@@ -55,7 +55,7 @@ export function MiniCalendar({ grid, dailyPnl = {}, maxAbs = 0, year, month, t, 
           {dayHeaders.map((header, idx) => (
             <div
               key={idx}
-              className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider py-0.5"
+              className="text-[11px] font-medium text-text-secondary py-0.5"
             >
               {header}
             </div>
@@ -95,7 +95,7 @@ export function MiniCalendar({ grid, dailyPnl = {}, maxAbs = 0, year, month, t, 
                   <div
                     key={cIdx}
                     title={cellTitle}
-                    className={`aspect-square rounded-md border flex items-center justify-center text-xs font-mono transition-transform group-hover:scale-[1.02] ${levelClass}`}
+                    className={`aspect-square rounded-md border flex items-center justify-center text-xs tabular-nums transition-transform group-hover:scale-[1.02] ${levelClass}`}
                   >
                     <span>{cell.day}</span>
                   </div>

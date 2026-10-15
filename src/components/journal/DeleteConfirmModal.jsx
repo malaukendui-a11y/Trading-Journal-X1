@@ -64,14 +64,14 @@ export function DeleteConfirmModal({
     <dialog
       ref={dialogRef}
       onClick={handleBackdropClick}
-      className="backdrop:bg-black/60 backdrop:backdrop-blur-xs p-0 bg-transparent rounded-2xl max-w-md w-[calc(100%-2rem)] shadow-2xl m-auto"
+      className="backdrop:bg-scrim p-0 bg-transparent rounded-[20px] max-w-md w-[calc(100%-2rem)] shadow-2xl m-auto"
       aria-labelledby="delete-modal-title"
     >
-      <div className="bg-bg-panel border border-line rounded-2xl p-6 text-text-primary">
+      <div className="glass-strong rounded-[20px] p-6 text-text-primary">
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-line">
           <div className="flex items-center gap-2.5 text-brick">
             <AlertTriangle className="w-5 h-5 shrink-0" />
-            <h2 id="delete-modal-title" className="text-base font-display font-semibold text-text-primary">
+            <h2 id="delete-modal-title" className="text-lg font-display font-semibold text-text-primary">
               {t('journal.deleteConfirmTitle')}
             </h2>
           </div>
@@ -80,7 +80,7 @@ export function DeleteConfirmModal({
             onClick={onClose}
             disabled={loading}
             aria-label={t('common.close')}
-            className="p-1 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised transition-colors disabled:opacity-50 cursor-pointer"
+            className="p-1 rounded-xl text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised transition-colors disabled:opacity-50 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -94,7 +94,7 @@ export function DeleteConfirmModal({
           <div className="mb-5 p-3.5 rounded-xl bg-bg-panel-raised border border-line flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="font-mono font-medium text-sm text-text-primary">
+                <span className="font-medium text-sm text-text-primary">
                   {trade.instrument}
                 </span>
                 <Tag variant={trade.direction} size="xs">
@@ -108,7 +108,7 @@ export function DeleteConfirmModal({
 
             <div className="text-right">
               <span
-                className={`font-mono font-semibold text-sm ${
+                className={`tabular-nums font-medium text-sm ${
                   isProfit ? 'text-sage' : isLoss ? 'text-brick' : 'text-text-secondary'
                 }`}
               >

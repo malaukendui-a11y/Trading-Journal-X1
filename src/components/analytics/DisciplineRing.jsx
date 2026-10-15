@@ -21,7 +21,7 @@ export function DisciplineRing({ score = null, t, lang }) {
 
   const toneColors = {
     sage: 'text-sage stroke-sage',
-    accent: 'text-accent stroke-accent',
+    accent: 'text-accent-text stroke-accent',
     brick: 'text-brick stroke-brick',
   }
 
@@ -44,7 +44,7 @@ export function DisciplineRing({ score = null, t, lang }) {
             fill="transparent"
             stroke="currentColor"
             strokeWidth={strokeWidth}
-            className="text-line/40"
+            className="text-line"
           />
 
           {/* Lingkaran Progress */}
@@ -66,10 +66,10 @@ export function DisciplineRing({ score = null, t, lang }) {
 
         {/* Teks di Tengah Ring Gauge */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none">
-          <span className={`font-mono text-3xl font-extrabold tracking-tight ${hasScore ? activeColorClass.split(' ')[0] : 'text-text-secondary'}`}>
+          <span className={`tabular-nums text-3xl font-medium ${hasScore ? activeColorClass.split(' ')[0] : 'text-text-secondary'}`}>
             {hasScore ? `${score.pct}%` : '—'}
           </span>
-          <span className="text-[11px] font-medium text-text-secondary uppercase tracking-wider mt-0.5">
+          <span className="text-[11px] font-medium text-text-secondary mt-0.5">
             {t('analytics.disciplineScoreTitle')}
           </span>
         </div>

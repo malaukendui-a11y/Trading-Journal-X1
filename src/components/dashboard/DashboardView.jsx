@@ -42,31 +42,31 @@ export function DashboardView({
         {/* Header Skeleton */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-2">
-            <div className="h-7 w-48 bg-line/60 rounded-md" />
-            <div className="h-4 w-72 bg-line/40 rounded-md" />
+            <div className="h-7 w-48 bg-bg-panel-raised rounded-md" />
+            <div className="h-4 w-72 bg-bg-panel-raised rounded-md" />
           </div>
-          <div className="h-10 w-44 bg-line/40 rounded-md" />
+          <div className="h-10 w-44 bg-bg-panel-raised rounded-md" />
         </div>
 
         {/* StatGrid Skeleton */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="p-4 border border-line bg-bg-panel space-y-3">
-              <div className="h-3 w-20 bg-line/50 rounded" />
-              <div className="h-8 w-24 bg-line/60 rounded" />
+            <Card key={i} className="p-4 space-y-3">
+              <div className="h-3 w-20 bg-bg-panel-raised rounded" />
+              <div className="h-8 w-24 bg-bg-panel-raised rounded" />
             </Card>
           ))}
         </div>
 
         {/* 2-Column Calendar & Trades Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-5 border border-line bg-bg-panel h-64 space-y-4">
-            <div className="h-4 w-32 bg-line/50 rounded" />
-            <div className="h-44 bg-line/30 rounded-lg" />
+          <Card className="p-5 h-64 space-y-4">
+            <div className="h-4 w-32 bg-bg-panel-raised rounded" />
+            <div className="h-44 bg-bg-panel-raised rounded-xl" />
           </Card>
-          <Card className="p-5 border border-line bg-bg-panel h-64 space-y-4">
-            <div className="h-4 w-32 bg-line/50 rounded" />
-            <div className="h-44 bg-line/30 rounded-lg" />
+          <Card className="p-5 h-64 space-y-4">
+            <div className="h-4 w-32 bg-bg-panel-raised rounded" />
+            <div className="h-44 bg-bg-panel-raised rounded-xl" />
           </Card>
         </div>
       </div>
@@ -78,20 +78,20 @@ export function DashboardView({
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text-primary">
+          <h1 className="font-display text-2xl md:text-[30px] font-semibold tracking-[-0.01em] text-text-primary">
             {t('dashboard.title')}
           </h1>
-          <p className="font-body text-xs text-text-secondary mt-1">
+          <p className="text-xs text-text-secondary mt-1">
             {t('dashboard.subtitle')}
           </p>
         </div>
 
-        <Card className="p-6 border border-brick/40 bg-brick/5 text-center flex flex-col items-center justify-center space-y-3">
-          <div className="w-10 h-10 rounded-full bg-brick/15 flex items-center justify-center text-brick font-bold">
+        <Card className="p-6 border-brick-border text-center flex flex-col items-center justify-center space-y-3">
+          <div className="w-10 h-10 rounded-full bg-brick-soft flex items-center justify-center text-brick font-bold">
             !
           </div>
           <div>
-            <h2 className="text-base font-semibold text-text-primary font-display">
+            <h2 className="text-lg font-semibold text-text-primary font-display">
               {t('dashboard.loadErrorTitle')}
             </h2>
             <p className="text-xs text-text-secondary mt-1 max-w-md">
@@ -117,12 +117,12 @@ export function DashboardView({
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       {/* Header & Balance Input */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-2 border-b border-line/40">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-2 border-b border-line">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text-primary">
+          <h1 className="font-display text-2xl md:text-[30px] font-semibold tracking-[-0.01em] text-text-primary">
             {t('dashboard.title')}
           </h1>
-          <p className="font-body text-xs text-text-secondary mt-1">
+          <p className="text-xs text-text-secondary mt-1">
             {t('dashboard.subtitle')}
           </p>
         </div>

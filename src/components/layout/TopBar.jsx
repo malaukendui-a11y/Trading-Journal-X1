@@ -25,7 +25,7 @@ export function TopBar({
   }).format(balance || 0)
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-bg-panel/90 backdrop-blur-md border-b border-line px-4 sm:px-6 py-3 transition-colors duration-200">
+    <header className="sticky top-4 z-30 mx-4 mt-4 glass-strong rounded-[20px] px-4 sm:px-6 py-3 transition-colors duration-200">
       <div className="flex items-center justify-between gap-4 max-w-[1400px] mx-auto">
         {/* Mobile Left: Hamburger button */}
         <div className="flex items-center gap-3 lg:hidden">
@@ -34,10 +34,10 @@ export function TopBar({
             onClick={onToggleMobile}
             aria-label={isMobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={isMobileOpen}
-            className="p-2 rounded-lg border border-line bg-bg-panel hover:border-accent text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 cursor-pointer"
+            className="p-2 rounded-xl border border-line bg-bg-panel-raised hover:border-accent-border text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 cursor-pointer"
           >
             {isMobileOpen ? (
-              <X className="w-5 h-5 text-accent" aria-hidden="true" />
+              <X className="w-5 h-5 text-accent-text" aria-hidden="true" />
             ) : (
               <Menu className="w-5 h-5 text-text-primary" aria-hidden="true" />
             )}
@@ -47,7 +47,7 @@ export function TopBar({
 
         {/* Desktop Left: Welcome text or title */}
         <div className="hidden lg:flex items-center gap-3">
-          <span className="text-xs font-mono text-text-secondary">
+          <span className="text-xs text-text-secondary">
             {t('app.tagline')}
           </span>
         </div>
@@ -56,12 +56,12 @@ export function TopBar({
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Saldo ringkas read-only (Addition 5) */}
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-bg-panel-raised text-xs font-mono"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-line bg-bg-panel-raised text-xs"
             title={`${t('dashboard.balanceLabel')}: ${formattedBalance}`}
           >
-            <Wallet className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
+            <Wallet className="w-3.5 h-3.5 text-accent-text" aria-hidden="true" />
             <span className="text-text-secondary hidden sm:inline">{t('common.balance')}:</span>
-            <span className="font-semibold text-text-primary">{formattedBalance}</span>
+            <span className="tabular-nums font-medium text-text-primary">{formattedBalance}</span>
           </div>
 
           {/* Nama Tampilan User (Desktop only) */}
