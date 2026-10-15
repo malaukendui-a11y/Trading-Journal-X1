@@ -248,7 +248,7 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => handleTabChange('forgot')}
-                  className="text-xs text-accent hover:underline cursor-pointer"
+                  className="text-xs text-accent-text hover:underline cursor-pointer"
                 >
                   {t('auth.forgotPasswordLink')}
                 </button>
@@ -276,7 +276,7 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => handleTabChange('register')}
-                  className="text-accent hover:underline font-medium cursor-pointer"
+                  className="text-accent-text hover:underline font-medium cursor-pointer"
                 >
                   {t('auth.registerTab')}
                 </button>
@@ -288,7 +288,7 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => handleTabChange('login')}
-                  className="text-accent hover:underline font-medium cursor-pointer"
+                  className="text-accent-text hover:underline font-medium cursor-pointer"
                 >
                   {t('auth.loginTab')}
                 </button>
@@ -298,7 +298,7 @@ export function AuthPage() {
               <button
                 type="button"
                 onClick={() => handleTabChange('login')}
-                className="text-accent hover:underline font-medium cursor-pointer"
+                className="text-accent-text hover:underline font-medium cursor-pointer"
               >
                 ← {t('auth.backToLogin')}
               </button>

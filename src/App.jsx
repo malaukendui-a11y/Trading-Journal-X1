@@ -8,27 +8,37 @@ import { LanguageProvider } from './context/LanguageContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { UserSettingsProvider } from './context/UserSettingsContext.jsx'
 import { AuthPage } from './pages/AuthPage.jsx'
-import { CalculatorPage } from './pages/CalculatorPage.jsx'
-import { CalendarPage } from './pages/CalendarPage.jsx'
-import { DashboardPage } from './pages/DashboardPage.jsx'
-import { JournalPage } from './pages/JournalPage.jsx'
 import { NotFoundPage } from './pages/NotFoundPage.jsx'
 import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx'
 
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage.jsx').then((m) => ({ default: m.DashboardPage }))
+)
+const CalculatorPage = lazy(() =>
+  import('./pages/CalculatorPage.jsx').then((m) => ({ default: m.CalculatorPage }))
+)
+const JournalPage = lazy(() =>
+  import('./pages/JournalPage.jsx').then((m) => ({ default: m.JournalPage }))
+)
+const CalendarPage = lazy(() =>
+  import('./pages/CalendarPage.jsx').then((m) => ({ default: m.CalendarPage }))
+)
 const AnalyticsPage = lazy(() =>
   import('./pages/AnalyticsPage.jsx').then((m) => ({ default: m.AnalyticsPage }))
 )
 
-function AnalyticsSkeleton() {
+function PageSkeleton() {
   return (
     <div className="space-y-6 animate-pulse" aria-busy="true">
       <div className="space-y-2">
         <div className="h-7 w-48 bg-line/60 rounded-md" />
         <div className="h-4 w-72 bg-line/40 rounded-md" />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 h-72 bg-line/20 rounded-xl" />
-        <div className="h-72 bg-line/20 rounded-xl" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="h-24 bg-line/20 rounded-xl" />
+        <div className="h-24 bg-line/20 rounded-xl" />
+        <div className="h-24 bg-line/20 rounded-xl" />
+        <div className="h-24 bg-line/20 rounded-xl" />
       </div>
       <div className="h-72 bg-line/20 rounded-xl" />
     </div>
@@ -42,7 +52,9 @@ function ProtectedLayout() {
     <UserSettingsProvider key={user?.id || 'guest'}>
       <JournalProvider key={user?.id || 'guest'}>
         <AppShell>
-          <Outlet />
+          <Suspense fallback={<PageSkeleton />}>
+            <Outlet />
+          </Suspense>
         </AppShell>
       </JournalProvider>
     </UserSettingsProvider>
@@ -72,14 +84,7 @@ export default function App() {
                 <Route path="/calculator" element={<CalculatorPage />} />
                 <Route path="/journal" element={<JournalPage />} />
                 <Route path="/calendar" element={<CalendarPage />} />
-                <Route
-                  path="/analytics"
-                  element={
-                    <Suspense fallback={<AnalyticsSkeleton />}>
-                      <AnalyticsPage />
-                    </Suspense>
-                  }
-                />
+                <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Routes>

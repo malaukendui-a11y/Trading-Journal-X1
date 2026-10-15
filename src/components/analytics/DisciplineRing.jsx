@@ -21,7 +21,7 @@ export function DisciplineRing({ score = null, t, lang }) {
 
   const toneColors = {
     sage: 'text-sage stroke-sage',
-    accent: 'text-accent stroke-accent',
+    accent: 'text-accent-text stroke-accent',
     brick: 'text-brick stroke-brick',
   }
 

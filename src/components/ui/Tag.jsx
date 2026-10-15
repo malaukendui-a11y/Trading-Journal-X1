@@ -20,7 +20,7 @@ export function Tag({
     revenge: 'bg-brick/15 text-brick border border-brick/30',
     sage: 'bg-sage/15 text-sage border border-sage/30',
     brick: 'bg-brick/15 text-brick border border-brick/30',
-    accent: 'bg-accent/15 text-accent border border-accent/30',
+    accent: 'bg-accent/15 text-accent-text border border-accent/30',
     neutral: 'bg-bg-panel-raised text-text-secondary border border-line',
   }[variant] || 'bg-bg-panel-raised text-text-secondary border border-line'
 

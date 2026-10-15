@@ -41,7 +41,7 @@ export function RDistributionChart({
           <p className="font-bold text-text-primary mb-0.5">
             {item.label}
           </p>
-          <p className="text-accent font-semibold">
+          <p className="text-accent-text font-semibold">
             {item.count} {t('dashboard.tradeCountUnit')}
           </p>
         </div>
