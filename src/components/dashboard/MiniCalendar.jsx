@@ -41,11 +41,11 @@ export function MiniCalendar({ grid, dailyPnl = {}, maxAbs = 0, year, month, t, 
         {/* Header Kartu */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-semibold text-text-primary font-display group-hover:text-accent transition-colors">
+            <h2 className="text-base font-semibold text-text-primary font-display group-hover:text-accent-text transition-colors">
               {t('dashboard.miniCalendarTitle')}
             </h2>
           </div>
-          <span className="text-xs font-medium text-accent flex items-center gap-1 group-hover:underline">
+          <span className="text-xs font-medium text-accent-text flex items-center gap-1 group-hover:underline">
             {t('dashboard.viewFullCalendar')}
           </span>
         </div>

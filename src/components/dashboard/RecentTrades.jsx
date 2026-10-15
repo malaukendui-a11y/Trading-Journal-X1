@@ -25,7 +25,7 @@ export function RecentTrades({ entries = [], t, lang }) {
         <Link
           to="/journal"
           aria-label={t('dashboard.viewAllTrades')}
-          className="text-xs font-medium text-accent hover:underline flex items-center gap-1"
+          className="text-xs font-medium text-accent-text hover:underline flex items-center gap-1"
         >
           {t('dashboard.viewAllTrades')}
         </Link>
@@ -39,7 +39,7 @@ export function RecentTrades({ entries = [], t, lang }) {
           </p>
           <Link
             to="/journal"
-            className="text-xs text-accent font-medium hover:underline inline-flex items-center gap-1"
+            className="text-xs text-accent-text font-medium hover:underline inline-flex items-center gap-1"
           >
             {t('journal.addTradeButton')} →
           </Link>

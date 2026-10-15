@@ -20,16 +20,16 @@ export function Button({
 
   const variantStyles = {
     primary:
-      'bg-accent text-white hover:brightness-105 active:brightness-95 shadow-sm',
+      'bg-accent-solid text-white hover:brightness-105 active:brightness-95 shadow-sm',
     secondary:
       'bg-bg-panel-raised text-text-primary border border-line hover:border-accent/50 active:bg-bg-panel',
     outline:
-      'bg-transparent text-text-primary border border-line hover:border-accent hover:text-accent',
+      'bg-transparent text-text-primary border border-line hover:border-accent hover:text-accent-text',
     ghost:
       'bg-transparent text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised',
     danger:
       'bg-brick text-white hover:brightness-110 active:brightness-90',
-  }[variant] || 'bg-accent text-white'
+  }[variant] || 'bg-accent-solid text-white'
 
   return (
     <button

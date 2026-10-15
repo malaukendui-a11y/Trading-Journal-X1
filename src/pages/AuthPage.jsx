@@ -9,8 +9,10 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { logDevError } from '../lib/devLog.js'
 import {
+  getPasswordPolicyErrorKey,
   mapAuthError,
   validateEmail,
+  validateLoginPassword,
   validatePassword,
   validatePasswordConfirmation,
 } from '../lib/authHelpers.js'
@@ -57,14 +59,19 @@ export function AuthPage() {
       return
     }
 
-    if (tab === 'login' || tab === 'register') {
-      if (!validatePassword(password)) {
-        setFormError(t('auth.passwordMinLength'))
+    if (tab === 'login') {
+      if (!validateLoginPassword(password)) {
+        setFormError(t('auth.passwordRequired'))
         return
       }
     }
 
     if (tab === 'register') {
+      if (!validatePassword(password)) {
+        const errorKey = getPasswordPolicyErrorKey(password) || 'auth.passwordPolicy'
+        setFormError(t(errorKey))
+        return
+      }
       if (!validatePasswordConfirmation(password, confirmPassword)) {
         setFormError(t('auth.passwordMismatch'))
         return
@@ -241,7 +248,7 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => handleTabChange('forgot')}
-                  className="text-xs text-accent hover:underline cursor-pointer"
+                  className="text-xs text-accent-text hover:underline cursor-pointer"
                 >
                   {t('auth.forgotPasswordLink')}
                 </button>
@@ -269,7 +276,7 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => handleTabChange('register')}
-                  className="text-accent hover:underline font-medium cursor-pointer"
+                  className="text-accent-text hover:underline font-medium cursor-pointer"
                 >
                   {t('auth.registerTab')}
                 </button>
@@ -281,7 +288,7 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => handleTabChange('login')}
-                  className="text-accent hover:underline font-medium cursor-pointer"
+                  className="text-accent-text hover:underline font-medium cursor-pointer"
                 >
                   {t('auth.loginTab')}
                 </button>
@@ -291,7 +298,7 @@ export function AuthPage() {
               <button
                 type="button"
                 onClick={() => handleTabChange('login')}
-                className="text-accent hover:underline font-medium cursor-pointer"
+                className="text-accent-text hover:underline font-medium cursor-pointer"
               >
                 ← {t('auth.backToLogin')}
               </button>

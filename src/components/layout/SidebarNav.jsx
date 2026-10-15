@@ -66,7 +66,7 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 ${
                     isActive
-                      ? 'bg-accent/15 text-accent font-semibold border-l-2 border-accent'
+                      ? 'bg-accent/15 text-accent-text font-semibold border-l-2 border-accent'
                       : 'text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised font-medium'
                   }`
                 }

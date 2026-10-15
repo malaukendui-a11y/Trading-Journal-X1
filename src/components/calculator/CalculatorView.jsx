@@ -58,7 +58,7 @@ export function CalculatorView({
           onClick={() => onModeChange?.('crypto')}
           className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors duration-150 flex items-center gap-2 ${
             mode === 'crypto'
-              ? 'border-accent text-accent'
+              ? 'border-accent text-accent-text'
               : 'border-transparent text-text-secondary hover:text-text-primary'
           }`}
         >
@@ -74,7 +74,7 @@ export function CalculatorView({
           onClick={() => onModeChange?.('forex')}
           className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors duration-150 flex items-center gap-2 ${
             mode === 'forex'
-              ? 'border-accent text-accent'
+              ? 'border-accent text-accent-text'
               : 'border-transparent text-text-secondary hover:text-text-primary'
           }`}
         >
@@ -90,7 +90,7 @@ export function CalculatorView({
           onClick={() => onModeChange?.('stock')}
           className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors duration-150 flex items-center gap-2 ${
             mode === 'stock'
-              ? 'border-accent text-accent'
+              ? 'border-accent text-accent-text'
               : 'border-transparent text-text-secondary hover:text-text-primary'
           }`}
         >
@@ -291,7 +291,7 @@ export function CalculatorView({
                 <span className="text-xs text-text-secondary block mb-1">
                   {t('calculator.rrRatio')}
                 </span>
-                <span className="font-display text-xl sm:text-2xl font-bold text-accent">
+                <span className="font-display text-xl sm:text-2xl font-bold text-accent-text">
                   {formatRR(result.rr, lang)}
                 </span>
               </Card>
@@ -332,7 +332,7 @@ export function CalculatorView({
                     <span className="text-xs text-text-secondary block mb-1">
                       {t('calculator.marginRequired')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-accent">
+                    <span className="font-display text-lg sm:text-xl font-semibold text-accent-text">
                       {formatCurrency(result.marginRequired, lang)}
                     </span>
                   </Card>
@@ -358,7 +358,7 @@ export function CalculatorView({
                     <span className="text-xs text-text-secondary block mb-1">
                       {t('calculator.lotStandard')}
                     </span>
-                    <span className="font-display text-lg sm:text-xl font-semibold text-accent">
+                    <span className="font-display text-lg sm:text-xl font-semibold text-accent-text">
                       {formatLot(result.lot, lang)}
                     </span>
                   </Card>
@@ -406,7 +406,7 @@ export function CalculatorView({
                     <span className="text-xs text-text-secondary block mb-1">
                       {t('calculator.shares')}
                     </span>
-                    <span className="font-display text-xl sm:text-2xl font-bold text-accent">
+                    <span className="font-display text-xl sm:text-2xl font-bold text-accent-text">
                       {formatShares(result.shares, lang)}
                     </span>
                   </Card>

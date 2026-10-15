@@ -5,6 +5,11 @@
   --line: #e3e5e9;
   --text-primary: #151823;
   --text-secondary: #6b7280;
+
+  --accent-text: #6d55b8;
+  --accent-solid: #6d55b8;
+  --sage: #177245;
+  --brick: #c2410c;
 }
 
 .dark {
@@ -14,6 +19,11 @@
   --line: #2a333d;
   --text-primary: #e9e4d8;
   --text-secondary: #a9a89e;
+
+  --accent-text: #9179d6;
+  --accent-solid: #6d55b8;
+  --sage: #52a878;
+  --brick: #d9786a;
 }
 
 @theme {
@@ -26,8 +36,10 @@
 
   --color-accent: #9179d6;
   --color-accent-dim: #5f4f96;
-  --color-sage: #7fa387;
-  --color-brick: #b1594a;
+  --color-accent-text: var(--accent-text);
+  --color-accent-solid: var(--accent-solid);
+  --color-sage: var(--sage);
+  --color-brick: var(--brick);
 
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;

@@ -328,7 +328,7 @@ export function CalendarView({
                           {cell.day}
                         </span>
                         {isToday && (
-                          <span className="text-[10px] uppercase font-bold text-accent px-1 rounded bg-bg-panel/80">
+                          <span className="text-[10px] uppercase font-bold text-accent-text px-1 rounded bg-bg-panel/80">
                             {t('calendar.todayBadge')}
                           </span>
                         )}
@@ -357,7 +357,7 @@ export function CalendarView({
                         {cell.day}
                       </span>
                       {isToday && (
-                        <span className="text-[10px] uppercase font-bold text-accent px-1 rounded bg-bg-panel/80">
+                        <span className="text-[10px] uppercase font-bold text-accent-text px-1 rounded bg-bg-panel/80">
                           {t('calendar.todayBadge')}
                         </span>
                       )}
