@@ -1,6 +1,6 @@
 # Trading Compass — Requirements Specification
 
-**Versi:** 1.6 — Analytics: equity curve harian, bin histogram R-multiple, ambang skor disiplin, state kosong, golden vectors (FR-ANA-1..5); melengkapi v1.5 (Kalender), v1.4 (Dashboard), dan v1.3 (FR-CALC).
+**Versi:** 1.12 — jadwal rilis diubah 15 Okt 2026: target selesai 23 Okt, urutan modul M9, domain dibeli setelah M9e (§5 butir 10); melengkapi v1.11 (animasi FR-AUTH-8, FR-AUTH-9, FR-THEME-4), v1.10 (konfirmasi hapus FR-JOURNAL-5, syarat password FR-AUTH-7), v1.9 (font IBM Plex Sans, FR-UI-8, FR-LOGO-3), v1.8 (glass-lite & responsif HP/tablet §3.10, FR-UI, FR-NAV-1, FR-DASH-6, FR-DASH-7, vektor S5) dan v1.7 (rilis publik).
 **Status:** Siap dipakai sebagai spec definitif untuk mulai development.
 **Sumber:** Diturunkan dari aplikasi lama `journal-trading-x1-supabase.html` (dianalisis langsung dari kode) + keputusan scope hasil diskusi. Dokumen ini tool-agnostic — dipakai sebagai referensi/prompt awal untuk agent AI apa pun (Antigravity, dll.), bukan format spesifik satu tool.
 
@@ -10,7 +10,7 @@
 
 **Trading Compass** (sebelumnya "Ledger — Disiplin di atas Prediksi") adalah personal trading discipline dashboard yang membantu trader menghitung risiko sebelum entry, mencatat setiap trade, dan mengevaluasi kedisiplinan eksekusi dari waktu ke waktu — dibangun ulang dari single-file HTML menjadi aplikasi React profesional dengan bahasa visual terinspirasi CoinMarketCap.
 
-- **Target pengguna:** Kenny sendiri (personal use), sekaligus berfungsi sebagai portofolio teknis (skill: React, Supabase, product design).
+- **Target pengguna:** publik — siapa pun boleh mendaftar (keputusan rilis v1.7), dengan konfirmasi email aktif; sekaligus portofolio teknis (skill: React, Supabase, product design).
 - **Nilai inti yang dipertahankan:** disiplin eksekusi di atas prediksi arah pasar — tercermin dari fitur skor disiplin & analitik plan-vs-revenge.
 - **Arah visual:** simple, minimalis, fungsi di atas segalanya — inspirasi CoinMarketCap dipakai secukupnya (kejelasan tipografi & disiplin warna), bukan kepadatan visualnya. Identitas warna violet/ungu dipertahankan, dukungan tema light/dark, dan logo mark orisinal (lihat 3.9).
 
@@ -47,11 +47,54 @@ Format: **EARS** (WHEN/IF/THE SYSTEM SHALL) — format yang sama dipakai Kiro un
 ### 3.1 Autentikasi
 
 - **FR-AUTH-1:** WHEN pengguna submit email & password valid pada form login, THE SYSTEM SHALL mengautentikasi via Supabase Auth dan mengarahkan ke Dashboard.
-- **FR-AUTH-2:** WHEN pengguna submit form registrasi dengan email unik dan password ≥ 6 karakter, THE SYSTEM SHALL membuat akun baru di Supabase Auth.
+- **FR-AUTH-2:** WHEN pengguna submit form registrasi dengan email unik dan password yang memenuhi **kebijakan password** (minimal 8 karakter, mengandung huruf kecil, huruf besar, dan angka), THE SYSTEM SHALL membuat akun baru di Supabase Auth. Validasi di client harus identik dengan pengaturan Supabase Auth (Minimum password length = 8; Password requirements = lowercase, uppercase letters and digits).
 - **FR-AUTH-3:** WHEN pengguna meminta reset password, THE SYSTEM SHALL mengirim link reset via Supabase Auth.
-- **FR-AUTH-3b:** WHEN pengguna membuka link reset dari email, THE SYSTEM SHALL menampilkan halaman `/reset-password` berisi form password baru (≥ 6 karakter, dengan konfirmasi), menyimpannya via Supabase Auth, lalu mengarahkan ke Dashboard. (Tanpa halaman ini link reset tidak berguna.)
+- **FR-AUTH-6:** `signUp` mengirim `emailRedirectTo = ${window.location.origin}/` sehingga link konfirmasi email kembali ke domain tempat pengguna mendaftar (lokal maupun produksi). Jika sesi tidak langsung tersedia (konfirmasi email aktif), tampil pesan "cek email Anda" (sudah ada sejak M1).
+- **FR-AUTH-3b:** WHEN pengguna membuka link reset dari email, THE SYSTEM SHALL menampilkan halaman `/reset-password` berisi form password baru (kebijakan password yang sama dengan FR-AUTH-2, dengan konfirmasi), menyimpannya via Supabase Auth, lalu mengarahkan ke Dashboard. (Tanpa halaman ini link reset tidak berguna.)
 - **FR-AUTH-4:** IF sesi login valid masih ada, THEN THE SYSTEM SHALL memulihkan sesi otomatis saat halaman dimuat ulang.
 - **FR-AUTH-5:** WHEN pengguna logout, THE SYSTEM SHALL menghapus sesi dan kembali ke layar Auth.
+- **FR-AUTH-7 (Syarat password tampil langsung — disetujui 9 Okt 2026):** Di halaman Daftar dan `/reset-password`, di bawah field password tampil empat syarat FR-AUTH-2 (minimal 8 karakter, huruf kecil, huruf besar, angka) yang diperbarui setiap kali pengguna mengetik.
+  - Syarat terpenuhi: ikon centang, warna `--sage`, teks tetap sama. Belum terpenuhi: ikon lingkaran netral, warna `--text-secondary`. Status juga tersedia sebagai teks untuk pembaca layar ("terpenuhi" / "belum terpenuhi"), tidak hanya lewat warna.
+  - Di `/reset-password` ada baris tambahan "Kedua password sama" untuk field konfirmasi.
+  - Daftar syarat memakai fungsi pengecek yang sama dengan validasi saat submit (satu sumber aturan), sehingga daftar dan pesan error tidak pernah berbeda. Validasi saat submit tetap berjalan seperti sekarang; tombol submit tidak dinonaktifkan.
+  - Field password kosong: semua syarat tampil netral, bukan merah.
+  - Vektor uji: P1 `""` → 0 dari 4 · P2 `Tradings` → panjang, huruf kecil, huruf besar terpenuhi; angka belum · P3 `trading1` → huruf besar belum · P4 `Tr1` → panjang belum · P5 `Trading1` → 4 dari 4.
+- **FR-AUTH-8 (Perpindahan Masuk ↔ Daftar beranimasi — disetujui 9 Okt 2026):** WHEN pengguna berpindah antara form Masuk dan Daftar, THE SYSTEM SHALL menampilkan perpindahan beranimasi sesuai design.md §5.6 A. Tidak ada tombol login pihak ketiga (Google, LinkedIn, GitHub, Facebook).
+  - ≥ 1024 px: satu kartu 960 × 560 px berisi kedua form berdampingan. Panel ungu bergeser menutupi form yang tidak aktif dalam **600 ms**. Isi panel: "Belum punya akun?" + tombol "Daftar" (saat mode Masuk), atau "Sudah punya akun?" + tombol "Masuk" (saat mode Daftar).
+  - < 1024 px: satu kartu dengan tab "Masuk" | "Daftar"; indikator tab dan form bergeser dalam 450 ms.
+  - Judul form sama di semua ukuran layar: "Selamat datang kembali" (Masuk) dan "Buat akun baru" (Daftar). Teks penjelas di bawahnya tidak berubah.
+  - Form yang tidak aktif diberi atribut `inert` (tidak terjangkau Tab, klik, maupun pembaca layar). Setelah berpindah, fokus pindah ke field Email form yang baru tampil.
+  - Routing tidak diubah: kalau Masuk dan Daftar saat ini memakai URL berbeda, tetap begitu (layout yang sama tetap ter-mount supaya animasi berjalan); kalau memakai satu URL dengan state, tetap begitu. Tidak ada route baru.
+  - Tidak berubah: isi field saat berpindah, pesan error login, syarat password (FR-AUTH-7), validasi, dan panggilan Supabase. Lupa password dan `/reset-password` tetap kartu tunggal tanpa panel geser.
+  - Setelah daftar berhasil (FR-AUTH-6), isi sisi Daftar diganti pesan "Cek email Anda" seperti papan Cek-Email di mockup; tombol "Kembali ke halaman masuk" memindah ke mode Masuk.
+  - Jika tinggi layar lebih kecil dari kartu (mis. laptop 1366 × 768), halaman boleh di-scroll vertikal; kartu tidak terpotong.
+  - Reduced motion (FR-UI-6): berpindah seketika.
+  - Uji manual: daftar A1–A9 di design.md §5.6 A.
+- **FR-AUTH-9 (Layar loading setelah masuk — disetujui 9 Okt 2026):** WHEN login dengan email dan password berhasil, THE SYSTEM SHALL menampilkan layar loading (design.md §5.6 B) sampai Dashboard benar-benar siap, lalu memudar dalam 240 ms ke Dashboard.
+  - "Siap" = sesi tersedia, baris `user_settings` sudah di-upsert dan dibaca (tema dan bahasa sudah diterapkan), pemuatan pertama `JournalContext` selesai, dan chunk lazy halaman tujuan sudah dimuat. Tidak ada jeda buatan selain batas minimum di bawah, dan tidak ada persentase progres.
+  - Setelah login: tampil seketika, **minimal 800 ms**. Saat sesi dipulihkan (reload / FR-AUTH-4, atau kembali dari link email): hanya tampil jika belum siap dalam 300 ms; sekali tampil, minimal 500 ms supaya tidak berkedip. Waktu mulai: saat login berhasil (login), atau saat layar loading pertama kali dipasang (pulih).
+  - Selama fase `hidden` (300 ms pertama saat pulih), halaman di belakangnya belum ditampilkan, jadi pengguna tidak melihat Dashboard setengah jadi lalu layar loading. Selama layar loading tampil, halaman di belakangnya tidak bisa dijangkau keyboard maupun pembaca layar (`inert`).
+  - Belum siap setelah 10 detik: teks berubah menjadi "Masih memuat" dan muncul tombol "Coba lagi" (memuat ulang halaman).
+  - Gagal memuat: "Dashboard belum bisa dimuat" dengan tombol "Coba lagi" (memuat ulang halaman) dan "Keluar" (FR-AUTH-5). Pengguna tidak pernah terjebak di layar loading.
+  - Login gagal tidak memunculkan layar loading; pesan error tetap seperti sekarang.
+  - Aksesibilitas: teks status di elemen `role="status"`; pesan gagal di elemen `role="alert"` terpisah (bukan di dalam status); grafik kompas dekoratif (`aria-hidden`). Setelah layar loading hilang, fokus pindah ke judul halaman.
+  - Teks mengikuti bahasa yang sedang aktif (ID/EN). Reduced motion: jarum diam menghadap utara, tanpa bar berjalan, tanpa fade.
+  - Logika waktu dipisah ke fungsi murni `getBootPhase` di `src/lib/bootTiming.js` (hasil: `hidden` · `loading` · `slow` · `error` · `done`), diuji dengan vektor berikut. `now` dan `readyAt` dalam ms sejak waktu mulai; `readyAt` = waktu semua tanda siap terpenuhi (`null` jika belum). Fungsi menganggap belum siap selama `now < readyAt`, jadi vektor berlaku untuk kedua cara pengisian.
+
+  | ID | Kasus | Hasil |
+  |---|---|---|
+  | B1 | login, siap di 150 | now 0 / 799 → loading · 800 → done |
+  | B2 | login, siap di 1200 | 800 / 1199 → loading · 1200 → done |
+  | B3 | pulih, siap di 200 | 0 / 199 → hidden · 200 → done (tidak pernah tampil) |
+  | B4 | pulih, siap di 450 | 299 → hidden · 300 / 799 → loading · 800 → done |
+  | B5 | pulih, siap tepat di 300 | 299 → hidden · 300 → loading · 800 → done |
+  | B6 | pulih, siap di 2000 | 1999 → loading · 2000 → done |
+  | B7 | login, belum siap | 9999 → loading · 10000 → slow |
+  | B8 | pulih, belum siap | 299 → hidden · 10000 → slow |
+  | B9 | login, siap di 12000 | 11999 → slow · 12000 → done |
+  | B10 | `failed = true` (login now 100 / pulih now 50) | error |
+
+  - Uji manual: daftar L1–L7 di design.md §5.6 B.
 
 ### 3.2 Dashboard (Ringkasan)
 
@@ -69,6 +112,8 @@ Dashboard memakai data yang sama dengan Jurnal (`JournalContext`) dan pengaturan
 - **FR-DASH-2 (Saldo akun):** input inline. Validasi: angka finite, 0 ≤ saldo ≤ 1e12. Disimpan ke `user_settings.balance` (dengan `updated_at`) saat **blur** atau **Enter**, dilewati jika nilainya tidak berubah. Update yang mengenai 0 baris dianggap gagal. Saat gagal: nilai kembali ke nilai tersimpan dan pesan generik tampil. Setelah tersimpan, saldo di TopBar dan nilai awal Kalkulator langsung memakai nilai baru tanpa refresh (state pengaturan dipakai bersama).
 - **FR-DASH-3 (Mini heatmap):** grid bulan berjalan (zona waktu lokal) memakai aturan FR-CAL-6 yang sama persis dengan halaman Kalender. Seluruh kartu adalah satu tautan ke `/calendar`.
 - **FR-DASH-4 (5 trade terakhir):** lima entri teratas dengan urutan yang sama dengan Jurnal (`trade_date desc, created_at desc, id desc`), dengan tautan ke `/journal`. Saat belum ada trade, tampil state kosong dengan tautan ke Jurnal.
+- **FR-DASH-6 (Ringkasan bulan berjalan — disetujui M9):** kartu berisi P&L, win rate, dan jumlah hari trading bulan berjalan (zona waktu lokal), dihitung dengan `monthSummary` yang sama dengan halaman Kalender (FR-CAL-4), sehingga angkanya selalu identik dengan Kalender untuk bulan yang sama.
+- **FR-DASH-7 (Aksi cepat — disetujui M9):** empat kartu tautan: Hitung Risiko → `/calculator`; Catat Trade → membuka form tambah trade di Jurnal (mekanisme FR-NAV-1); Lihat Kalender → `/calendar`; Analisis → `/analytics`. Setiap kartu satu elemen tautan/tombol dengan nama aksesibel.
 - **FR-DASH-5 (Golden test vectors):**
 
   | ID | Data | Hasil |
@@ -78,6 +123,7 @@ Dashboard memakai data yang sama dengan Jurnal (`JournalContext`) dan pengaturan
   | S2 | pnl [0.1, 0.2] | totalPnl ≈ 0.30000000000000004 → tampil $0.30 (EN); winRate 100 |
   | S3 | 2 menang dari 3 | winRate 67 |
   | S4 | 1 menang dari 8 | winRate 13 (`Math.round(12.5)` = 13) |
+  | S5 | data uji M5 (1 Okt +60 dan +40, 2 Okt −25 dan 0, 30 Sep +500), bulan Okt 2026 | ringkasan bulan (FR-DASH-6): P&L 75; win rate 50; hari trading 2 |
 
 ### 3.3 Kalkulator Risiko
 
@@ -154,6 +200,12 @@ Input yang sama dipakai bersama oleh ketiga mode (saldo, risiko %, entry, SL, TP
 - **FR-JOURNAL-2:** WHEN trade baru disimpan, THE SYSTEM SHALL mencatat tanggal trade sebagai tipe data `date` asli (**bukan** string hasil format lokal — lihat Temuan Teknis #5), lalu memperbarui Dashboard, Kalender, dan Analytics.
 - **FR-JOURNAL-3:** THE SYSTEM SHALL menampilkan riwayat seluruh trade milik pengguna, terbaru di atas.
 - **FR-JOURNAL-4:** WHEN pengguna menghapus sebuah trade, THE SYSTEM SHALL menghapusnya dari database dan memperbarui semua tampilan turunan (Dashboard/Kalender/Analytics).
+- **FR-JOURNAL-5 (Konfirmasi sebelum hapus — disetujui 9 Okt 2026):** WHEN pengguna menekan tombol hapus pada sebuah trade, THE SYSTEM SHALL menampilkan dialog konfirmasi (`role="alertdialog"`) sebelum data dihapus.
+  - Isi: judul "Hapus trade ini?", penjelasan bahwa trade tidak bisa dikembalikan serta Dashboard, Kalender, dan Analytics ikut diperbarui, dan ringkasan trade (instrumen, arah, tanggal, status, P&L).
+  - Tombol "Batal" (fokus awal, pilihan aman) dan "Hapus trade" (latar `--brick`, teks `--on-danger`). Escape atau klik di luar dialog = Batal. Setelah dialog tertutup, fokus kembali ke tombol hapus yang memicunya.
+  - Selama proses hapus berjalan, tombol "Hapus trade" nonaktif supaya permintaan tidak terkirim dua kali. Jika gagal: dialog tertutup, trade tetap ada, dan pesan error generik tampil.
+  - Di bawah 768 px dialog tampil sebagai bottom sheet (FR-UI-4).
+  - Uji: Batal → trade tetap ada · Escape → sama dengan Batal · konfirmasi → trade hilang dari Jurnal dan angka Dashboard, Kalender, Analytics ikut berubah tanpa reload · klik "Hapus trade" dua kali cepat → hanya satu permintaan hapus.
 
 ### 3.5 Kalender (BARU)
 
@@ -235,12 +287,40 @@ Analytics memakai data yang sama dengan Jurnal (`JournalContext`), seluruh riway
 - **FR-THEME-1:** THE SYSTEM SHALL menyediakan toggle tema light/dark.
 - **FR-THEME-2:** Warna aksen violet/ungu (`#9179d6`) SHALL konsisten dipakai di kedua tema.
 - **FR-THEME-3:** Preferensi tema SHALL tersimpan per akun (tabel `user_settings`, kolom `theme`).
+- **FR-THEME-4 (Transisi ganti tema — disetujui 9 Okt 2026):** WHEN pengguna menekan tombol tema, THE SYSTEM SHALL menampilkan tema baru yang terbuka melingkar dari tengah tombol tema dalam **600 ms** memakai View Transitions API (design.md §5.6 C).
+  - Titik awal selalu tengah tombol, sehingga klik dan keyboard (Tab + Enter) berperilaku sama.
+  - Browser tanpa View Transitions, atau reduced motion aktif: tema berganti seketika seperti sekarang, tanpa error di console.
+  - Penyimpanan tema (FR-THEME-3) dan `theme-init.js` tidak berubah. Tidak ada dependency baru.
+  - Fungsi murni di `src/lib/themeTransition.js`, diuji dengan vektor berikut (rect = posisi tombol: left, top, width, height; layar = lebar × tinggi viewport; r dibulatkan ke atas).
+
+  | ID | Masukan | Hasil |
+  |---|---|---|
+  | T1 | `getRevealCircle` rect 1152, 26, 44, 44 · layar 1440 × 840 | x 1174, y 48, r 1417 |
+  | T2 | rect 16, 16, 44, 44 · layar 390 × 844 | x 38, y 38, r 880 |
+  | T3 | rect 328, 8, 44, 44 · layar 390 × 844 | x 350, y 30, r 887 |
+  | T4 | `shouldAnimateTheme` View Transitions ada, reduced motion tidak | true |
+  | T5 | View Transitions tidak ada | false |
+  | T6 | View Transitions ada, reduced motion aktif | false |
+
+  - Uji manual: daftar TM1–TM5 di design.md §5.6 C.
+
+### 3.10 Tampilan & Responsif (M9 — disetujui, masuk v1)
+
+- **FR-UI-1:** Tampilan memakai gaya **glass-lite** sesuai design.md §5.1 dan §5.5 (latar gradien bercahaya, kartu semi-transparan, blur hanya pada panel navigasi dan modal), di tema gelap maupun terang.
+- **FR-UI-2 (Navigasi):** < 768 px bottom tab bar 5 menu; 768–1023 px sidebar ikon (rail); ≥ 1024 px sidebar penuh. Keluar tersedia di semua ukuran (di HP lewat menu avatar). Drawer hamburger M2 dihapus.
+- **FR-UI-3:** Di bawah 768 px, daftar Jurnal tampil sebagai kartu per trade (data dan aksi sama dengan baris tabel, termasuk hapus).
+- **FR-UI-4:** Di bawah 768 px, modal tampil sebagai bottom sheet; fokus tetap terkunci di dalam modal, Escape menutup, dan fokus kembali ke pemicu.
+- **FR-UI-5:** Tidak ada scroll horizontal halaman pada lebar 360 px; area sentuh ≥ 44×44 px; huruf input ≥ 16 px di bawah 768 px.
+- **FR-UI-6:** Jika browser tidak mendukung `backdrop-filter`, atau pengguna memilih *reduced transparency*, tampilan memakai panel solid. Jika pengguna memilih *reduced motion*, tidak ada animasi maupun transisi gerak (termasuk FR-AUTH-8, FR-AUTH-9, FR-THEME-4).
+- **FR-UI-7:** M9 tidak mengubah rumus, struktur data, validasi, maupun perilaku fitur, kecuali tambahan yang disetujui 9 Okt 2026: FR-JOURNAL-5 (konfirmasi hapus), FR-AUTH-7 (syarat password tampil langsung), FR-AUTH-8 (perpindahan Masuk ↔ Daftar beranimasi), FR-AUTH-9 (layar loading setelah masuk), dan FR-THEME-4 (transisi ganti tema). Seluruh tes Vitest yang ada harus tetap lulus tanpa diubah (kecuali tes tampilan yang memang memeriksa markup layout); tes baru untuk tambahan-tambahan itu boleh ditambahkan, dan vektor B1–B10 (FR-AUTH-9) serta T1–T6 (FR-THEME-4) **wajib** ditulis sebagai tes Vitest. Jika waktu tidak cukup sebelum go/no-go, FR-THEME-4 yang pertama ditunda.
+- **FR-UI-8 (Tipografi — disetujui 8 Okt 2026):** Seluruh teks memakai IBM Plex Sans sesuai design.md §5.2. Semua angka uang, persen, lot, dan jumlah di kartu dan tabel memakai `tabular-nums` sehingga digit sejajar per kolom. Space Grotesk, Inter, dan IBM Plex Mono tidak dimuat lagi (tidak ada di `index.html`, CSS, maupun komponen). Jika Google Fonts gagal dimuat, teks tetap tampil dengan font sistem (`display=swap` + fallback `system-ui`).
+- **FR-NAV-1 (Tombol "Tambah Trade" global — disetujui M9):** di top bar (≥ 768 px). Menekan tombol membawa ke `/journal` dengan state router `{ openAdd: true }`; JournalPage membuka form tambah sekali, lalu membersihkan state (`navigate(..., { replace: true, state: null })`) sehingga refresh atau tombol Back tidak membuka form lagi. Jika sudah berada di `/journal`, form langsung terbuka.
 
 ### 3.9 Logo & Brand Mark (FINAL — disetujui)
 
 - **FR-LOGO-1:** THE SYSTEM SHALL menampilkan brand mark di pojok kiri atas header pada semua halaman: ikon "Needle Mark" (bentuk kite/diamond dua-nada ungu, poros tengah) + wordmark "Trading Compass".
 - **FR-LOGO-2:** Warna ikon SHALL memakai dua gradasi dari hue ungu yang sama (`#9179d6` dan `#5f4f96`) — tonal, bukan kontras tinggi — supaya konsisten di kedua tema.
-- **FR-LOGO-3:** Wordmark SHALL memakai font display yang sama dengan sistem desain (Space Grotesk, fallback Inter).
+- **FR-LOGO-3:** Wordmark SHALL memakai font display yang sama dengan sistem desain (IBM Plex Sans 600, fallback `system-ui`; design.md §5.2).
 - Aset final: `trading-compass-logo-icon.svg` (ikon saja, untuk favicon/app-icon) dan komponen `BrandLogo` (ikon + wordmark, theme-aware).
 
 ---
@@ -249,15 +329,26 @@ Analytics memakai data yang sama dengan Jurnal (`JournalContext`), seluruh riway
 
 | Kategori | Kebutuhan |
 |---|---|
-| Performa | Interaksi utama (ganti tab, hitung kalkulator) terasa instan (<100ms); load awal wajar untuk SPA ringan |
-| Responsif | Desktop-first (breakpoint utama ≥1280px), tetap dapat dipakai di tablet/mobile |
-| Aksesibilitas | Kontras warna teks minimal WCAG AA di kedua tema; seluruh form bisa dioperasikan via keyboard |
+| Performa | Interaksi utama (ganti tab, hitung kalkulator) terasa instan (<100ms). Semua halaman terproteksi dimuat secara lazy; chunk JS utama < 500 kB (tanpa peringatan ukuran chunk dari Vite). Lighthouse (build produksi, mode desktop): Performance ≥ 90. Animasi (FR-AUTH-8, FR-THEME-4) mulai < 100 ms setelah klik. Jeda yang disengaja dan diterima: layar loading minimal 800 ms setelah login dan minimal 500 ms saat pulih bila sempat tampil (FR-AUTH-9); selama transisi tema (600 ms) klik tidak diproses, perilaku bawaan View Transitions (FR-THEME-4) |
+| Responsif | Didukung penuh dari 360 px sampai 1920 px sesuai design.md §5.3 (HP, tablet, desktop). Diuji minimal di lebar 360, 390, 768, 1024, 1280, 1440 px dan di satu HP sungguhan |
+| Aksesibilitas | Kontras warna teks minimal WCAG AA (4,5:1) di kedua tema memakai token di design.md §5.1 (sudah dihitung); seluruh form bisa dioperasikan via keyboard. Lighthouse Accessibility ≥ 95 |
 | Kompatibilitas browser | Chrome, Firefox, Edge, Safari versi terbaru |
-| Keamanan | RLS wajib aktif di semua tabel; kredensial Supabase sebagai environment variable (tidak di-hardcode); security headers (CSP, X-Frame-Options) di `vercel.json`; validasi input sebelum kirim ke Supabase; error Supabase tidak pernah ditampilkan mentah ke UI |
+| Keamanan | RLS wajib aktif di semua tabel; kredensial Supabase sebagai environment variable (tidak di-hardcode); security headers sesuai design.md §8.1 di `vercel.json` (sumber tunggal: `security-headers.json`); validasi input sebelum kirim ke Supabase; error Supabase tidak pernah ditampilkan mentah ke UI; kebijakan password FR-AUTH-2 |
 | Kualitas kode | Komponen reusable (Button, Card, Tag, dsb.), logika kalkulasi dipisah dari UI agar mudah di-unit-test |
 | Deployment | Build otomatis dari GitHub ke Vercel |
 
 ---
+
+### 4.1 Konfigurasi produksi (dikerjakan manual di dashboard, bukan oleh agent)
+
+| Tempat | Pengaturan |
+|---|---|
+| Supabase → Authentication → Sign In / Providers → Email | Confirm email **ON**; Minimum password length **8**; Password requirements **lowercase, uppercase letters and digits** |
+| Supabase → Authentication → Emails → SMTP Settings | SMTP kustom aktif (layanan bawaan hanya untuk development, batas kirimnya sangat kecil) |
+| Supabase → Authentication → URL Configuration | Site URL = URL produksi; Redirect URLs = `https://<domain-produksi>/**` dan `http://localhost:5173/**` |
+| Vercel → Project → Settings → Environment Variables | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (Production + Preview) |
+
+Catatan: peringatan Security Advisor "Leaked Password Protection Disabled" tidak bisa ditindaklanjuti di paket Free (fitur ini khusus Pro ke atas) dan diterima sebagai risiko yang diketahui. CAPTCHA untuk pendaftaran ditunda ke v2.
 
 ## 5. Keputusan Final (sebelumnya "Asumsi & Item Terbuka")
 
@@ -271,6 +362,8 @@ Seluruh item di bawah sudah dikonfirmasi Anda — dicatat sebagai jejak keputusa
 6. ✅ **Formula R-multiple di Analytics** (FR-ANA-2): dikonfirmasi dipakai sesuai rancangan.
 7. ✅ **Tagline**: "Disiplin di atas Prediksi" tetap dipakai di bawah nama baru "Trading Compass".
 8. ✅ **Pilihan teknis lain**: Vite (build tool), Recharts (chart), lucide-react (icon), penamaan kolom skema berbahasa Inggris — seluruhnya dikonfirmasi (menyusul Tailwind CSS & sidebar kiri yang dikonfirmasi sebelumnya).
+9. ✅ **Animasi (9 Okt 2026)**: "ubah tampilan" mencakup keduanya, yaitu perpindahan Masuk ↔ Daftar (panel geser 0,6 detik, tanpa login Google/LinkedIn/GitHub/Facebook) dan ganti tema (transisi melingkar). Layar loading setelah login minimal 0,8 detik. Prototipe: kanvas mockup, halaman "Animasi".
+10. ✅ **Jadwal rilis (diubah 15 Okt 2026)**: target selesai **23 Okt 2026**. Urutan M9, satu modul per sesi agent dan masing-masing di-merge sendiri: **M9a** fondasi visual (token §5.1, font FR-UI-8, FR-LOGO-3, efek kaca FR-UI-1) → **M9c** FR-JOURNAL-5 + FR-AUTH-7 → **M9b** layout responsif (FR-UI-2 s.d. FR-UI-5, FR-NAV-1, FR-DASH-6, FR-DASH-7) → **M9d** FR-AUTH-8 + FR-AUTH-9 → **M9e** FR-THEME-4. Keputusan lanjut/tunda fitur: 20 Okt; modul yang belum ter-merge saat itu pindah ke v1.1. Domain dibeli setelah M9e, lalu SMTP kustom dan konfigurasi produksi (§4.1), deploy, dan smoke test produksi.
 
 ---
 
@@ -282,5 +375,7 @@ Seluruh item di bawah sudah dikonfirmasi Anda — dicatat sebagai jejak keputusa
 - [ ] Responsif diverifikasi di breakpoint desktop, tablet, dan mobile
 - [ ] Kedua bahasa (ID/EN) lengkap tanpa key terjemahan yang hilang
 - [ ] Kedua tema (light/dark) lolos cek kontras
+- [ ] Animasi FR-AUTH-8, FR-AUTH-9, FR-THEME-4 mati saat reduced motion, dan tidak ada error console di browser tanpa View Transitions
+- [ ] Tes Vitest vektor B1–B10 (FR-AUTH-9) dan T1–T6 (FR-THEME-4) lulus
 - [ ] Ter-deploy otomatis dari GitHub ke Vercel, environment variable terkonfigurasi (bukan hardcode)
 - [ ] README repo berisi cara menjalankan project secara lokal

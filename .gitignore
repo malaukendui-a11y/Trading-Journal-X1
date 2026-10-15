@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code: file pribadi, jangan di-commit
+.claude/settings.local.json
+CLAUDE.local.md
