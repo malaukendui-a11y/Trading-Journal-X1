@@ -46,7 +46,8 @@
       "PowerShell(Get-Content *.env*)",
       "PowerShell(Select-String *.env*)",
       "Bash(git push*)",
-      "Bash(git merge*)",
+      "Bash(git merge)",
+      "Bash(git merge *)",
       "Bash(git rebase*)",
       "Bash(git reset*)",
       "Bash(git restore*)",
@@ -57,9 +58,11 @@
       "Bash(git commit --amend*)",
       "Bash(npm run dev*)",
       "Bash(npm run preview*)",
-      "Bash(npx vite*)",
+      "Bash(npx vite)",
+      "Bash(npx vite *)",
       "PowerShell(git push*)",
-      "PowerShell(git merge*)",
+      "PowerShell(git merge)",
+      "PowerShell(git merge *)",
       "PowerShell(git rebase*)",
       "PowerShell(git reset*)",
       "PowerShell(git restore*)",
@@ -70,7 +73,8 @@
       "PowerShell(git commit --amend*)",
       "PowerShell(npm run dev*)",
       "PowerShell(npm run preview*)",
-      "PowerShell(npx vite*)"
+      "PowerShell(npx vite)",
+      "PowerShell(npx vite *)"
     ]
   }
 }
