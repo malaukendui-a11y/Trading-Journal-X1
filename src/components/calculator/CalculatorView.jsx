@@ -342,9 +342,9 @@ export function CalculatorView({
                 {result.warnings?.includes('calculator.marginWarning') && (
                   <div
                     role="alert"
-                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 flex items-center gap-2.5 text-amber-500 text-xs sm:text-sm"
+                    className="rounded-xl border border-brick-border bg-brick-soft p-3.5 flex items-center gap-2.5 text-text-primary text-xs sm:text-sm"
                   >
-                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                    <AlertTriangle className="w-5 h-5 shrink-0 text-brick" />
                     <span>{t('calculator.marginWarning')}</span>
                   </div>
                 )}
@@ -425,9 +425,9 @@ export function CalculatorView({
                 {result.warnings?.includes('calculator.warningZeroShares') && (
                   <div
                     role="alert"
-                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 flex items-center gap-2.5 text-amber-500 text-xs sm:text-sm"
+                    className="rounded-xl border border-brick-border bg-brick-soft p-3.5 flex items-center gap-2.5 text-text-primary text-xs sm:text-sm"
                   >
-                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                    <AlertTriangle className="w-5 h-5 shrink-0 text-brick" />
                     <span>{t('calculator.warningZeroShares')}</span>
                   </div>
                 )}

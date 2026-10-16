@@ -14,8 +14,8 @@ export function Tag({
   }[size] || 'text-xs px-2.5'
 
   const variantStyles = {
-    buy: 'bg-sage-soft text-sage border border-sage-border',
-    sell: 'bg-brick-soft text-brick border border-brick-border',
+    buy: 'bg-bg-panel-raised text-text-primary border border-line',
+    sell: 'bg-bg-panel-raised text-text-primary border border-line',
     plan: 'bg-accent-soft text-accent-text border border-transparent',
     revenge: 'bg-brick-soft text-brick border border-brick-border',
     sage: 'bg-sage-soft text-sage border border-sage-border',
