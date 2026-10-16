@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import {
+  checkPasswordPolicy,
+  getPasswordPolicyErrorKey,
   mapAuthError,
   validateEmail,
+  validateLoginPassword,
   validatePassword,
   validatePasswordConfirmation,
 } from '../src/lib/authHelpers.js'
 import { translate, translations } from '../src/lib/i18n.js'
 
-describe('M1: Auth Validation Helpers', () => {
+describe('M1 & M8a: Auth Validation Helpers', () => {
   it('memvalidasi format email dengan benar', () => {
     expect(validateEmail('trader@example.com')).toBe(true)
     expect(validateEmail('user.name+tag@sub.domain.co')).toBe(true)
@@ -18,12 +21,34 @@ describe('M1: Auth Validation Helpers', () => {
     expect(validateEmail(null)).toBe(false)
   })
 
-  it('memvalidasi panjang password minimal 6 karakter', () => {
-    expect(validatePassword('123456')).toBe(true)
-    expect(validatePassword('securePass123!')).toBe(true)
-    expect(validatePassword('12345')).toBe(false)
+  it('memvalidasi kebijakan password FR-AUTH-2 (min 8 karakter, huruf kecil, huruf besar, angka)', () => {
+    // 5 golden test vectors dari spesifikasi FR-AUTH-2:
+    expect(validatePassword('abc12345')).toBe(false) // ditolak: tanpa huruf besar
+    expect(validatePassword('ABCDEFG1')).toBe(false) // ditolak: tanpa huruf kecil
+    expect(validatePassword('Abcdefgh')).toBe(false) // ditolak: tanpa angka
+    expect(validatePassword('Abc1234')).toBe(false)  // ditolak: panjang < 8
+    expect(validatePassword('Abcdefg1')).toBe(true)  // diterima: memenuhi seluruh syarat
+
+    // Nilai kosong / non-string
     expect(validatePassword('')).toBe(false)
     expect(validatePassword(null)).toBe(false)
+    expect(validatePassword(undefined)).toBe(false)
+  })
+
+  it('validateLoginPassword mengizinkan password non-kosong agar akun lama tetap bisa login', () => {
+    expect(validateLoginPassword('123456')).toBe(true)
+    expect(validateLoginPassword('abc')).toBe(true)
+    expect(validateLoginPassword('Abcdefg1')).toBe(true)
+    expect(validateLoginPassword('')).toBe(false)
+    expect(validateLoginPassword(null)).toBe(false)
+  })
+
+  it('getPasswordPolicyErrorKey memetakan syarat yang gagal ke kunci i18n yang sesuai', () => {
+    expect(getPasswordPolicyErrorKey('Abc1234')).toBe('auth.passwordMinLength')
+    expect(getPasswordPolicyErrorKey('ABCDEFG1')).toBe('auth.passwordNeedLower')
+    expect(getPasswordPolicyErrorKey('abcdefg1')).toBe('auth.passwordNeedUpper')
+    expect(getPasswordPolicyErrorKey('Abcdefgh')).toBe('auth.passwordNeedDigit')
+    expect(getPasswordPolicyErrorKey('Abcdefg1')).toBeNull()
   })
 
   it('memvalidasi kecocokan konfirmasi password', () => {

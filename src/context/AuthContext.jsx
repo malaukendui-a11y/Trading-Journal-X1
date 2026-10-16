@@ -101,11 +101,14 @@ export function AuthProvider({ children }) {
     return data
   }
 
-  // FR-AUTH-2: Registrasi akun baru
+  // FR-AUTH-2 & FR-AUTH-6: Registrasi akun baru dengan redirect konfirmasi email
   const signUp = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+      },
     })
     if (error) throw error
     return data

@@ -9,8 +9,10 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { logDevError } from '../lib/devLog.js'
 import {
+  getPasswordPolicyErrorKey,
   mapAuthError,
   validateEmail,
+  validateLoginPassword,
   validatePassword,
   validatePasswordConfirmation,
 } from '../lib/authHelpers.js'
@@ -57,14 +59,19 @@ export function AuthPage() {
       return
     }
 
-    if (tab === 'login' || tab === 'register') {
-      if (!validatePassword(password)) {
-        setFormError(t('auth.passwordMinLength'))
+    if (tab === 'login') {
+      if (!validateLoginPassword(password)) {
+        setFormError(t('auth.passwordRequired'))
         return
       }
     }
 
     if (tab === 'register') {
+      if (!validatePassword(password)) {
+        const errorKey = getPasswordPolicyErrorKey(password) || 'auth.passwordPolicy'
+        setFormError(t(errorKey))
+        return
+      }
       if (!validatePasswordConfirmation(password, confirmPassword)) {
         setFormError(t('auth.passwordMismatch'))
         return

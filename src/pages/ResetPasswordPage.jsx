@@ -9,6 +9,7 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { logDevError } from '../lib/devLog.js'
 import {
+  getPasswordPolicyErrorKey,
   mapAuthError,
   validatePassword,
   validatePasswordConfirmation,
@@ -41,9 +42,10 @@ export function ResetPasswordPage() {
     setFormError('')
     setSuccessMessage('')
 
-    // 1. Validasi password minimal 6 karakter
+    // 1. Validasi kebijakan password baru (FR-AUTH-2)
     if (!validatePassword(newPassword)) {
-      setFormError(t('auth.passwordMinLength'))
+      const errorKey = getPasswordPolicyErrorKey(newPassword) || 'auth.passwordPolicy'
+      setFormError(t(errorKey))
       return
     }
 
