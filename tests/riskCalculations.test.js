@@ -4,6 +4,7 @@ import {
   calculate,
   getInitialBalance,
   parseDecimal,
+  resolveInitialBalance,
 } from '../src/lib/riskCalculations.js'
 
 // Simple PRNG Mulberry32 untuk invarian deterministik
@@ -44,6 +45,41 @@ describe('M4: Unit Test parseDecimal & getInitialBalance', () => {
     // Sudah disentuh -> pertahankan input pengguna
     expect(getInitialBalance(5000, '250', true)).toBe('250')
     expect(getInitialBalance(5000, '', true)).toBe('')
+  })
+})
+
+describe('FR-CALC-6: resolveInitialBalance (saldo awal diisi setelah termuat)', () => {
+  it('saldo belum termuat (masih 0) dan belum disentuh: field kosong dan belum dikunci', () => {
+    expect(resolveInitialBalance(0, '', false)).toEqual({ value: '', lock: false })
+  })
+
+  it('urutan render saat reload: 0 dulu, lalu saldo dari DB tetap terisi', () => {
+    const first = resolveInitialBalance(0, '', false)
+    expect(first.lock).toBe(false)
+    expect(resolveInitialBalance(100, first.value, false)).toEqual({ value: '100', lock: true })
+  })
+
+  it('saldo berupa string > 0 diisi dan dikunci', () => {
+    expect(resolveInitialBalance('10000', '', false)).toEqual({ value: '10000', lock: true })
+  })
+
+  it('field disentuh sebelum saldo termuat: input pengguna dipertahankan dan dikunci', () => {
+    expect(resolveInitialBalance(0, '250', true)).toEqual({ value: '250', lock: true })
+  })
+
+  it('field sudah disentuh lalu saldo datang: input pengguna tidak ditimpa', () => {
+    expect(resolveInitialBalance(5000, '250', true)).toEqual({ value: '250', lock: true })
+  })
+
+  it('saldo tidak valid (null, undefined, negatif, NaN) tidak mengisi dan tidak mengunci', () => {
+    expect(resolveInitialBalance(null, '', false)).toEqual({ value: '', lock: false })
+    expect(resolveInitialBalance(undefined, '', false)).toEqual({ value: '', lock: false })
+    expect(resolveInitialBalance(-100, '', false)).toEqual({ value: '', lock: false })
+    expect(resolveInitialBalance(NaN, '', false)).toEqual({ value: '', lock: false })
+  })
+
+  it('field disentuh lalu dikosongkan: tetap kosong dan dikunci', () => {
+    expect(resolveInitialBalance(5000, '', true)).toEqual({ value: '', lock: true })
   })
 })
 

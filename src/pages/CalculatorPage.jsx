@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { CalculatorView } from '../components/calculator/CalculatorView.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { useUserSettings } from '../hooks/useUserSettings.js'
-import { CONTRACT_PRESETS, calculate, getInitialBalance } from '../lib/riskCalculations.js'
+import { CONTRACT_PRESETS, calculate, resolveInitialBalance } from '../lib/riskCalculations.js'
 
 export function CalculatorPage() {
   const { t, lang } = useLanguage()
@@ -23,15 +23,20 @@ export function CalculatorPage() {
   const isBalanceTouchedRef = useRef(false)
   const hasInitializedBalanceRef = useRef(false)
 
-  // Inisialisasi saldo dari user_settings.balance satu kali jika balance > 0 dan belum disentuh
+  // Inisialisasi saldo dari user_settings.balance satu kali setelah termuat, jika belum disentuh (FR-CALC-6)
   useEffect(() => {
     if (hasInitializedBalanceRef.current) return
 
-    if (savedBalance !== undefined && savedBalance !== null) {
-      const initial = getInitialBalance(savedBalance, values.balance, isBalanceTouchedRef.current)
-      if (initial && initial !== values.balance) {
-        setValues((prev) => ({ ...prev, balance: initial }))
-      }
+    const { value, lock } = resolveInitialBalance(
+      savedBalance,
+      values.balance,
+      isBalanceTouchedRef.current
+    )
+    if (value && value !== values.balance) {
+      setValues((prev) => ({ ...prev, balance: value }))
+    }
+    // Kunci hanya setelah saldo > 0 termuat atau field disentuh, bukan saat saldo awal masih 0
+    if (lock) {
       hasInitializedBalanceRef.current = true
     }
   }, [savedBalance, values.balance])

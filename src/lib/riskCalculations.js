@@ -56,6 +56,23 @@ export function getInitialBalance(settingsBalance, currentInput, isTouched) {
 }
 
 /**
+ * Keputusan isi saldo awal kalkulator (FR-CALC-6): diisi satu kali setelah user_settings termuat.
+ * Kunci hanya dipasang setelah saldo > 0 tersedia atau field sudah disentuh pengguna,
+ * sehingga nilai awal 0 (sebelum user_settings termuat) tidak mengunci field yang masih kosong.
+ *
+ * @param {number|string|null|undefined} settingsBalance
+ * @param {string} currentInput
+ * @param {boolean} isTouched
+ * @returns {{ value: string, lock: boolean }}
+ */
+export function resolveInitialBalance(settingsBalance, currentInput, isTouched) {
+  const value = getInitialBalance(settingsBalance, currentInput, isTouched)
+  const num = Number(settingsBalance)
+  const lock = Boolean(isTouched) || (Number.isFinite(num) && num > 0)
+  return { value, lock }
+}
+
+/**
  * Menghitung ukuran posisi dan parameter risiko berdasarkan mode trading.
  *
  * @param {'crypto'|'forex'|'stock'} mode
