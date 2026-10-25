@@ -127,10 +127,10 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
     <dialog
       ref={dialogRef}
       onClick={handleBackdropClick}
-      className="backdrop:bg-black/60 backdrop:backdrop-blur-xs p-0 bg-transparent rounded-2xl max-w-xl w-[calc(100%-2rem)] shadow-2xl m-auto"
+      className="backdrop:bg-scrim p-0 bg-transparent rounded-[20px] max-w-xl w-[calc(100%-2rem)] shadow-2xl m-auto"
       aria-labelledby="journal-modal-title"
     >
-      <div className="bg-bg-panel border border-line rounded-2xl p-6 sm:p-7 text-text-primary max-h-[90vh] overflow-y-auto">
+      <div className="glass-strong rounded-[20px] p-6 sm:p-7 text-text-primary max-h-[90vh] overflow-y-auto">
         {/* Header Modal */}
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-line">
           <h2 id="journal-modal-title" className="text-lg font-display font-semibold text-text-primary">
@@ -141,7 +141,7 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
             onClick={onClose}
             disabled={submitting}
             aria-label={t('common.close')}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised transition-colors disabled:opacity-50 cursor-pointer"
+            className="p-1.5 rounded-xl text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised transition-colors disabled:opacity-50 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -151,7 +151,7 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
         {submitError && (
           <div
             role="alert"
-            className="mb-4 p-3 rounded-lg bg-brick/10 border border-brick/30 text-brick text-xs font-medium"
+            className="mb-4 p-3 rounded-xl bg-brick-soft border border-brick-border text-brick text-xs font-medium"
           >
             {submitError}
           </div>
@@ -188,15 +188,15 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
 
           {/* Baris 2: Arah Posisi (BUY / SELL) */}
           <div className="flex flex-col gap-1.5 text-left">
-            <label className="text-xs font-medium text-text-secondary">
+            <label className="text-[13px] font-medium text-text-secondary">
               {t('journal.direction')} <span className="text-brick">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2.5">
               <label
-                className={`flex items-center justify-center py-2.5 px-3 rounded-lg border text-xs font-mono font-medium cursor-pointer transition-colors ${
+                className={`flex items-center justify-center min-h-11 py-2.5 px-3 rounded-xl border text-sm font-medium cursor-pointer transition-colors ${
                   formData.direction === 'buy'
-                    ? 'bg-sage/20 border-sage text-sage font-semibold shadow-xs'
-                    : 'bg-bg-panel border-line text-text-secondary hover:text-text-primary hover:border-text-secondary/40'
+                    ? 'bg-sage-soft border-sage-border text-sage font-semibold'
+                    : 'bg-bg-panel-raised border-line text-text-secondary hover:text-text-primary hover:border-accent-border'
                 } ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <input
@@ -212,10 +212,10 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
               </label>
 
               <label
-                className={`flex items-center justify-center py-2.5 px-3 rounded-lg border text-xs font-mono font-medium cursor-pointer transition-colors ${
+                className={`flex items-center justify-center min-h-11 py-2.5 px-3 rounded-xl border text-sm font-medium cursor-pointer transition-colors ${
                   formData.direction === 'sell'
-                    ? 'bg-brick/20 border-brick text-brick font-semibold shadow-xs'
-                    : 'bg-bg-panel border-line text-text-secondary hover:text-text-primary hover:border-text-secondary/40'
+                    ? 'bg-brick-soft border-brick-border text-brick font-semibold'
+                    : 'bg-bg-panel-raised border-line text-text-secondary hover:text-text-primary hover:border-accent-border'
                 } ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <input
@@ -290,15 +290,15 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
             />
 
             <div className="flex flex-col gap-1.5 text-left">
-              <label className="text-xs font-medium text-text-secondary">
+              <label className="text-[13px] font-medium text-text-secondary">
                 {t('journal.status')} <span className="text-brick">*</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <label
-                  className={`flex items-center justify-center py-2.5 px-2 rounded-lg border text-[11px] sm:text-xs font-medium cursor-pointer transition-colors text-center ${
+                  className={`flex items-center justify-center min-h-11 py-2.5 px-2 rounded-xl border text-[13px] sm:text-sm font-medium cursor-pointer transition-colors text-center ${
                     formData.status === 'plan'
-                      ? 'bg-sage/20 border-sage text-sage font-semibold shadow-xs'
-                      : 'bg-bg-panel border-line text-text-secondary hover:text-text-primary hover:border-text-secondary/40'
+                      ? 'bg-accent-soft border-accent-border text-accent-text font-semibold'
+                      : 'bg-bg-panel-raised border-line text-text-secondary hover:text-text-primary hover:border-accent-border'
                   } ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <input
@@ -314,10 +314,10 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
                 </label>
 
                 <label
-                  className={`flex items-center justify-center py-2.5 px-2 rounded-lg border text-[11px] sm:text-xs font-medium cursor-pointer transition-colors text-center ${
+                  className={`flex items-center justify-center min-h-11 py-2.5 px-2 rounded-xl border text-[13px] sm:text-sm font-medium cursor-pointer transition-colors text-center ${
                     formData.status === 'revenge'
-                      ? 'bg-brick/20 border-brick text-brick font-semibold shadow-xs'
-                      : 'bg-bg-panel border-line text-text-secondary hover:text-text-primary hover:border-text-secondary/40'
+                      ? 'bg-brick-soft border-brick-border text-brick font-semibold'
+                      : 'bg-bg-panel-raised border-line text-text-secondary hover:text-text-primary hover:border-accent-border'
                   } ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <input
@@ -340,9 +340,9 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
 
           {/* Baris 5: Catatan (Opsional, max 500) */}
           <div className="flex flex-col gap-1.5 text-left w-full">
-            <div className="flex justify-between items-center text-xs font-medium text-text-secondary">
+            <div className="flex justify-between items-center text-[13px] font-medium text-text-secondary">
               <label htmlFor="journal-note">{t('journal.note')}</label>
-              <span className="text-[10px] text-text-secondary font-mono">
+              <span className="text-[11px] text-text-secondary tabular-nums">
                 {formData.note.length}/500
               </span>
             </div>
@@ -354,7 +354,7 @@ export function JournalFormModal({ isOpen, onClose, onSubmit }) {
               onChange={e => handleChange('note', e.target.value)}
               placeholder={t('journal.notePlaceholder')}
               disabled={submitting}
-              className="w-full px-3.5 py-2 rounded-lg text-sm bg-bg-panel border border-line text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none transition-colors duration-150 disabled:opacity-50"
+              className="w-full px-3.5 py-2 rounded-xl text-base md:text-[15px] leading-[1.6] bg-bg-panel-raised border border-line text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-[3px] focus:ring-[rgba(145,121,214,.22)] focus:border-accent-border resize-none transition-colors duration-150 disabled:opacity-50"
             />
             {errors.note && (
               <span className="text-xs text-brick font-medium">{t(errors.note)}</span>

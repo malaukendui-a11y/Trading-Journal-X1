@@ -75,7 +75,7 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg text-text-primary flex flex-col justify-between p-4 sm:p-6 transition-colors duration-200">
+    <div className="min-h-screen text-text-primary flex flex-col justify-between p-4 sm:p-6 transition-colors duration-200">
       {/* Header bar */}
       <header className="w-full max-w-5xl mx-auto flex items-center justify-between py-2">
         <BrandLogo />
@@ -83,7 +83,7 @@ export function ResetPasswordPage() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="px-2.5 py-1 rounded-lg text-xs font-medium border border-line bg-bg-panel hover:border-accent transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium border border-line bg-bg-panel-raised hover:border-accent-border transition-colors cursor-pointer"
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? '🌙' : '☀️'}
@@ -91,7 +91,7 @@ export function ResetPasswordPage() {
           <button
             type="button"
             onClick={toggleLanguage}
-            className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium border border-line bg-bg-panel hover:border-accent transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium border border-line bg-bg-panel-raised hover:border-accent-border transition-colors cursor-pointer"
             aria-label="Toggle Language"
           >
             {lang.toUpperCase()}
@@ -101,12 +101,12 @@ export function ResetPasswordPage() {
 
       {/* Main container */}
       <main className="w-full max-w-md mx-auto my-auto py-6">
-        <Card className="border border-line bg-bg-panel shadow-md">
+        <Card>
           <div className="text-center mb-6">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
+            <h1 className="font-display text-2xl md:text-[30px] font-semibold tracking-[-0.01em] text-text-primary">
               {t('auth.resetPasswordTitle')}
             </h1>
-            <p className="text-xs text-text-secondary mt-1 font-body">
+            <p className="text-xs text-text-secondary mt-1">
               {t('auth.resetPasswordSubtitle')}
             </p>
           </div>
@@ -114,7 +114,7 @@ export function ResetPasswordPage() {
           {formError && (
             <div
               role="alert"
-              className="mb-4 p-3 rounded-lg text-xs font-medium bg-brick/10 border border-brick/30 text-brick animate-in fade-in"
+              className="mb-4 p-3 rounded-xl text-xs font-medium bg-brick-soft border border-brick-border text-brick animate-in fade-in"
             >
               {formError}
             </div>
@@ -123,7 +123,7 @@ export function ResetPasswordPage() {
           {successMessage && (
             <div
               role="status"
-              className="mb-4 p-3 rounded-lg text-xs font-medium bg-sage/10 border border-sage/30 text-sage animate-in fade-in"
+              className="mb-4 p-3 rounded-xl text-xs font-medium bg-sage-soft border border-sage-border text-sage animate-in fade-in"
             >
               {successMessage}
             </div>

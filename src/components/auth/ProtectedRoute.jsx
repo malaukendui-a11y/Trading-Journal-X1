@@ -8,10 +8,10 @@ export function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg text-text-primary">
+      <div className="min-h-screen flex items-center justify-center text-text-primary">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-mono text-text-secondary">{t('common.loading')}</span>
+          <span className="text-xs text-text-secondary">{t('common.loading')}</span>
         </div>
       </div>
     )

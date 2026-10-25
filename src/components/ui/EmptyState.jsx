@@ -9,7 +9,7 @@ export function EmptyState({
 }) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed border-line bg-bg-panel/40 ${className}`}
+      className={`flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-[20px] border border-dashed border-line bg-bg-panel ${className}`}
     >
       {Icon && (
         <div className="w-12 h-12 mb-4 rounded-full bg-bg-panel-raised flex items-center justify-center text-text-secondary border border-line">
@@ -17,7 +17,7 @@ export function EmptyState({
         </div>
       )}
       {title && (
-        <h3 className="font-display font-medium text-base sm:text-lg text-text-primary mb-1">
+        <h3 className="font-display font-semibold text-lg text-text-primary mb-1">
           {title}
         </h3>
       )}

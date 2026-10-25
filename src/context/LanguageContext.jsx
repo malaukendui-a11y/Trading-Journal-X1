@@ -27,11 +27,12 @@ export function LanguageProvider({ children }) {
     document.documentElement.lang = lang
   }, [lang])
 
-  const setLanguage = (newLang) => {
+  // Referensi stabil: dipakai sebagai dependency effect baca user_settings
+  const setLanguage = useCallback((newLang) => {
     if (newLang === 'id' || newLang === 'en') {
       setLangState(newLang)
     }
-  }
+  }, [])
 
   const toggleLanguage = () => {
     setLangState((prev) => (prev === 'id' ? 'en' : 'id'))

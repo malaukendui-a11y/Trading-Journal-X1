@@ -27,17 +27,19 @@ export function RDistributionChart({
 
   // Warna bar berbasis nilai bin R
   const getBarColor = (binVal) => {
-    if (binVal > 0) return 'var(--color-sage, #22c55e)'
-    if (binVal < 0) return 'var(--color-brick, #ef4444)'
-    return 'var(--color-line, #6b7280)'
+    if (binVal > 0) return 'var(--sage)'
+    if (binVal < 0) return 'var(--brick)'
+    return 'var(--text-secondary)'
   }
+  // Batang 0R memakai opasitas .45 (design.md §5.5)
+  const getBarOpacity = (binVal) => (binVal === 0 ? 0.45 : 1)
 
   // Tooltip kustom
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload
       return (
-        <div className="rounded-lg border border-line bg-bg-panel p-2.5 shadow-md font-mono text-xs">
+        <div className="glass rounded-xl p-2.5 tabular-nums text-xs">
           <p className="font-bold text-text-primary mb-0.5">
             {item.label}
           </p>
@@ -57,15 +59,15 @@ export function RDistributionChart({
       data={bins}
       margin={{ top: 10, right: 15, left: -10, bottom: 5 }}
     >
-      <CartesianGrid stroke="var(--color-line, #374151)" strokeDasharray="3 3" opacity={0.4} />
+      <CartesianGrid stroke="var(--line)" strokeDasharray="3 3" />
       <XAxis
         dataKey="label"
-        stroke="var(--color-text-secondary, #9ca3af)"
+        stroke="var(--text-secondary)"
         fontSize={11}
         tickLine={false}
       />
       <YAxis
-        stroke="var(--color-text-secondary, #9ca3af)"
+        stroke="var(--text-secondary)"
         fontSize={11}
         tickLine={false}
         allowDecimals={false}
@@ -73,7 +75,7 @@ export function RDistributionChart({
       <Tooltip content={<CustomTooltip />} />
       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
         {bins.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={getBarColor(entry.bin)} />
+          <Cell key={`cell-${index}`} fill={getBarColor(entry.bin)} fillOpacity={getBarOpacity(entry.bin)} />
         ))}
       </Bar>
     </BarChart>
@@ -101,7 +103,7 @@ export function RDistributionChart({
       )}
 
       {/* Rincian Trade yang Dikecualikan dari Histogram */}
-      <div className="pt-2 border-t border-line/40">
+      <div className="pt-2 border-t border-line">
         {excluded > 0 ? (
           <p className="text-xs text-text-secondary">
             {t('analytics.excludedText', {

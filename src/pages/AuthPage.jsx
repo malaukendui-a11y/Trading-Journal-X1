@@ -109,7 +109,7 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg text-text-primary flex flex-col justify-between p-4 sm:p-6 transition-colors duration-200">
+    <div className="min-h-screen text-text-primary flex flex-col justify-between p-4 sm:p-6 transition-colors duration-200">
       {/* Top utility bar: Logo & quick toggles */}
       <header className="w-full max-w-5xl mx-auto flex items-center justify-between py-2">
         <BrandLogo />
@@ -117,7 +117,7 @@ export function AuthPage() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="px-2.5 py-1 rounded-lg text-xs font-medium border border-line bg-bg-panel hover:border-accent transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium border border-line bg-bg-panel-raised hover:border-accent-border transition-colors cursor-pointer"
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? '🌙' : '☀️'}
@@ -125,7 +125,7 @@ export function AuthPage() {
           <button
             type="button"
             onClick={toggleLanguage}
-            className="px-2.5 py-1 rounded-lg text-xs font-mono font-medium border border-line bg-bg-panel hover:border-accent transition-colors cursor-pointer"
+            className="px-2.5 py-1 rounded-xl text-xs font-medium border border-line bg-bg-panel-raised hover:border-accent-border transition-colors cursor-pointer"
             aria-label="Toggle Language"
           >
             {lang.toUpperCase()}
@@ -135,27 +135,27 @@ export function AuthPage() {
 
       {/* Main card */}
       <main className="w-full max-w-md mx-auto my-auto py-6">
-        <Card className="border border-line bg-bg-panel shadow-md">
+        <Card>
           {/* Header & Tagline */}
           <div className="text-center mb-6">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
+            <h1 className="font-display text-2xl md:text-[30px] font-semibold tracking-[-0.01em] text-text-primary">
               {tab === 'login' && t('auth.loginTab')}
               {tab === 'register' && t('auth.registerTab')}
               {tab === 'forgot' && t('auth.forgotTab')}
             </h1>
-            <p className="text-xs text-text-secondary mt-1 font-body">
+            <p className="text-xs text-text-secondary mt-1">
               {t('app.tagline')}
             </p>
           </div>
 
           {/* Tab buttons */}
-          <div className="flex p-1 bg-bg-panel-raised rounded-lg border border-line mb-6">
+          <div className="flex p-1 bg-bg-panel-raised rounded-xl border border-line mb-6">
             <button
               type="button"
               onClick={() => handleTabChange('login')}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
                 tab === 'login'
-                  ? 'bg-bg-panel text-text-primary shadow-xs font-semibold'
+                  ? 'bg-accent-soft text-accent-text font-semibold'
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >
@@ -164,9 +164,9 @@ export function AuthPage() {
             <button
               type="button"
               onClick={() => handleTabChange('register')}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
                 tab === 'register'
-                  ? 'bg-bg-panel text-text-primary shadow-xs font-semibold'
+                  ? 'bg-accent-soft text-accent-text font-semibold'
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >
@@ -175,9 +175,9 @@ export function AuthPage() {
             <button
               type="button"
               onClick={() => handleTabChange('forgot')}
-              className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
                 tab === 'forgot'
-                  ? 'bg-bg-panel text-text-primary shadow-xs font-semibold'
+                  ? 'bg-accent-soft text-accent-text font-semibold'
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >
@@ -189,7 +189,7 @@ export function AuthPage() {
           {formError && (
             <div
               role="alert"
-              className="mb-4 p-3 rounded-lg text-xs font-medium bg-brick/10 border border-brick/30 text-brick animate-in fade-in"
+              className="mb-4 p-3 rounded-xl text-xs font-medium bg-brick-soft border border-brick-border text-brick animate-in fade-in"
             >
               {formError}
             </div>
@@ -198,7 +198,7 @@ export function AuthPage() {
           {successMessage && (
             <div
               role="status"
-              className="mb-4 p-3 rounded-lg text-xs font-medium bg-sage/10 border border-sage/30 text-sage animate-in fade-in"
+              className="mb-4 p-3 rounded-xl text-xs font-medium bg-sage-soft border border-sage-border text-sage animate-in fade-in"
             >
               {successMessage}
             </div>

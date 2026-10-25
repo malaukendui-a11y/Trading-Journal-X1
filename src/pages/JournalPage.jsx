@@ -61,10 +61,10 @@ export function JournalPage() {
       {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text-primary tracking-tight">
+          <h1 className="font-display text-2xl md:text-[30px] font-semibold tracking-[-0.01em] text-text-primary">
             {t('journal.title')}
           </h1>
-          <p className="font-body text-xs text-text-secondary mt-1">
+          <p className="text-xs text-text-secondary mt-1">
             {t('journal.subtitle')}
           </p>
         </div>
@@ -74,7 +74,7 @@ export function JournalPage() {
           variant="primary"
           size="md"
           onClick={() => setIsAddModalOpen(true)}
-          className="self-start sm:self-auto shadow-sm"
+          className="self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>{t('journal.addTradeButton')}</span>
@@ -87,8 +87,8 @@ export function JournalPage() {
           role="alert"
           className={`p-3.5 rounded-xl border flex items-center justify-between text-xs font-medium transition-all ${
             feedback.type === 'success'
-              ? 'bg-sage/10 border-sage/30 text-sage'
-              : 'bg-brick/10 border-brick/30 text-brick'
+              ? 'bg-sage-soft border-sage-border text-sage'
+              : 'bg-brick-soft border-brick-border text-brick'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export function JournalPage() {
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-1 rounded hover:bg-bg-panel-raised transition-colors cursor-pointer"
             aria-label={t('common.close')}
           >
             <X className="w-3.5 h-3.5" />
@@ -112,12 +112,12 @@ export function JournalPage() {
 
       {/* State Loading: Skeleton Table */}
       {loading && (
-        <Card className="border border-line bg-bg-panel p-6 overflow-hidden">
+        <Card className="p-6 overflow-hidden">
           <div className="space-y-4 animate-pulse">
             <div className="h-6 bg-bg-panel-raised rounded-md w-1/4" />
             <div className="space-y-2.5 pt-2">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-10 bg-bg-panel-raised/70 rounded-lg w-full" />
+                <div key={i} className="h-10 bg-bg-panel-raised rounded-xl w-full" />
               ))}
             </div>
           </div>
@@ -126,12 +126,12 @@ export function JournalPage() {
 
       {/* State Error: Tampilan Pesan Error Generik + Tombol Coba Lagi */}
       {!loading && error && (
-        <Card className="border border-brick/30 bg-bg-panel p-8 text-center">
+        <Card className="border-brick-border p-8 text-center">
           <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-            <div className="w-12 h-12 rounded-full bg-brick/10 border border-brick/30 flex items-center justify-center text-brick mb-3">
+            <div className="w-12 h-12 rounded-full bg-brick-soft border border-brick-border flex items-center justify-center text-brick mb-3">
               <AlertCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-display font-semibold text-text-primary text-base mb-1">
+            <h3 className="font-display font-semibold text-text-primary text-lg mb-1">
               {t('common.error')}
             </h3>
             <p className="text-sm text-text-secondary mb-5 leading-relaxed">
@@ -163,7 +163,7 @@ export function JournalPage() {
               variant="primary"
               size="md"
               onClick={() => setIsAddModalOpen(true)}
-              className="gap-2 shadow-sm"
+              className="gap-2"
             >
               <Plus className="w-4 h-4" />
               <span>{t('journal.addTradeButton')}</span>
@@ -174,11 +174,11 @@ export function JournalPage() {
 
       {/* State Berisi Data: Tabel Riwayat Trade */}
       {!loading && !error && entries.length > 0 && (
-        <Card className="border border-line bg-bg-panel overflow-hidden p-0">
+        <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="border-b border-line bg-bg-panel-raised/50 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">
+                <tr className="border-b border-line bg-bg-panel-raised text-[13px] font-medium text-text-secondary">
                   <th scope="col" className="py-3 px-4 whitespace-nowrap">
                     {t('journal.tableHeaderDate')}
                   </th>
@@ -211,7 +211,7 @@ export function JournalPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line/60">
+              <tbody className="divide-y divide-line">
                 {entries.map(entry => {
                   const pnlNum = Number(entry.pnl || 0)
                   const isProfit = pnlNum > 0
@@ -220,15 +220,15 @@ export function JournalPage() {
                   return (
                     <tr
                       key={entry.id}
-                      className="hover:bg-bg-panel-raised/40 transition-colors"
+                      className="hover:bg-bg-panel-raised transition-colors"
                     >
                       {/* Tanggal */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-xs text-text-secondary font-mono">
+                      <td className="py-3.5 px-4 whitespace-nowrap text-xs text-text-secondary num-table">
                         {formatDateDisplay(entry.trade_date, lang)}
                       </td>
 
                       {/* Instrumen */}
-                      <td className="py-3.5 px-4 whitespace-nowrap font-mono font-semibold text-text-primary text-xs">
+                      <td className="py-3.5 px-4 whitespace-nowrap font-semibold text-text-primary text-xs">
                         {entry.instrument}
                       </td>
 
@@ -240,23 +240,23 @@ export function JournalPage() {
                       </td>
 
                       {/* Entry Price */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-right font-mono text-xs text-text-secondary">
+                      <td className="py-3.5 px-4 whitespace-nowrap text-right num-table text-xs text-text-secondary">
                         {formatPrice(entry.entry_price, lang)}
                       </td>
 
                       {/* Stop Loss Price */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-right font-mono text-xs text-text-secondary">
+                      <td className="py-3.5 px-4 whitespace-nowrap text-right num-table text-xs text-text-secondary">
                         {formatPrice(entry.sl_price, lang)}
                       </td>
 
                       {/* Exit Price */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-right font-mono text-xs text-text-secondary">
+                      <td className="py-3.5 px-4 whitespace-nowrap text-right num-table text-xs text-text-secondary">
                         {formatPrice(entry.exit_price, lang)}
                       </td>
 
                       {/* Realized P&L */}
                       <td
-                        className={`py-3.5 px-4 whitespace-nowrap text-right font-mono font-semibold text-xs ${
+                        className={`py-3.5 px-4 whitespace-nowrap text-right num-table text-xs ${
                           isProfit
                             ? 'text-sage'
                             : isLoss
@@ -293,7 +293,7 @@ export function JournalPage() {
                           onClick={() => setDeleteTarget(entry)}
                           aria-label={t('common.delete')}
                           title={t('common.delete')}
-                          className="p-1.5 rounded-lg text-text-secondary hover:text-brick hover:bg-brick/10 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-xl text-text-secondary hover:text-brick hover:bg-brick-soft transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

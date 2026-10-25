@@ -10,6 +10,8 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [authEvent, setAuthEvent] = useState(null)
   const [loading, setLoading] = useState(true)
+  // user.id yang baris default user_settings-nya sudah selesai di-upsert (design §6.3)
+  const [settingsReadyUserId, setSettingsReadyUserId] = useState(null)
 
   const { theme } = useTheme()
   const { lang } = useLanguage()
@@ -68,6 +70,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!user?.id) return
 
+    let isCancelled = false
+
     async function ensureUserSettings() {
       try {
         await supabase.from('user_settings').upsert(
@@ -85,11 +89,23 @@ export function AuthProvider({ children }) {
         )
       } catch (err) {
         console.error('[AuthContext] Error ensuring user_settings:', err)
+      } finally {
+        // Pembacaan user_settings boleh dimulai setelah upsert selesai, berhasil maupun gagal
+        if (!isCancelled) {
+          setSettingsReadyUserId(user.id)
+        }
       }
     }
 
     ensureUserSettings()
+
+    return () => {
+      isCancelled = true
+    }
   }, [user?.id])
+
+  // Gerbang baca untuk UserSettingsContext: hanya true untuk user yang upsert-nya sudah selesai
+  const isSettingsInitialized = Boolean(user?.id) && settingsReadyUserId === user.id
 
   // FR-AUTH-1: Login dengan email & password
   const signIn = async (email, password) => {
@@ -143,6 +159,7 @@ export function AuthProvider({ children }) {
     session,
     authEvent,
     loading,
+    isSettingsInitialized,
     signIn,
     signUp,
     signOut,

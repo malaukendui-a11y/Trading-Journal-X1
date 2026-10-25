@@ -46,7 +46,7 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
           <button
             type="button"
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised focus:outline-none focus:ring-2 focus:ring-accent/40"
+            className="lg:hidden p-1.5 rounded-xl text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised focus:outline-none focus:ring-2 focus:ring-accent/40"
             aria-label={t('nav.closeMenu')}
           >
             <X className="w-5 h-5" aria-hidden="true" />
@@ -64,10 +64,10 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
                 end={item.end} // Addition 4: end={true} untuk '/'
                 onClick={onCloseMobile}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 ${
+                  `flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 ${
                     isActive
-                      ? 'bg-accent/15 text-accent-text font-semibold border-l-2 border-accent'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised font-medium'
+                      ? 'bg-accent-soft border-accent-border text-accent-text font-semibold shadow-[0_0_18px_rgba(145,121,214,.35)]'
+                      : 'border-transparent text-text-secondary hover:text-text-primary hover:bg-bg-panel-raised font-medium'
                   }`
                 }
               >
@@ -84,7 +84,7 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
         <button
           type="button"
           onClick={signOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:text-brick hover:bg-brick/10 transition-colors focus:outline-none focus:ring-2 focus:ring-brick/40 cursor-pointer"
+          className="w-full flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:text-brick hover:bg-brick-soft transition-colors focus:outline-none focus:ring-2 focus:ring-brick/40 cursor-pointer"
         >
           <LogOut className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>{t('nav.logout')}</span>
@@ -96,7 +96,7 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
   return (
     <>
       {/* Desktop Sidebar (>= 1024px): Fixed Sticky */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-bg-panel border-r border-line z-20 transition-colors duration-200">
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 h-[calc(100vh-2rem)] sticky top-4 m-4 glass-strong rounded-3xl z-20 transition-colors duration-200">
         {navContent}
       </aside>
 
@@ -105,7 +105,7 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-scrim transition-opacity"
             onClick={onCloseMobile}
             aria-hidden="true"
           />
@@ -115,7 +115,7 @@ export function SidebarNav({ isMobileOpen, onCloseMobile }) {
             role="dialog"
             aria-modal="true"
             aria-label={t('nav.menu')}
-            className="fixed inset-y-0 left-0 w-72 bg-bg-panel border-r border-line shadow-2xl animate-in slide-in-from-left duration-200"
+            className="fixed inset-y-0 left-0 w-72 glass-strong rounded-r-3xl shadow-2xl animate-in slide-in-from-left duration-200"
           >
             {navContent}
           </div>

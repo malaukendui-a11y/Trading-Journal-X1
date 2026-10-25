@@ -2,7 +2,32 @@
 @import "./styles/tokens.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Latar halaman (design.md §5.5, FR-UI-1).
+   Warna dasar ada di html; body sengaja tanpa background supaya gradien body::before terlihat. */
+html {
+  background: var(--bg);
+}
+
 body {
-  background-color: var(--bg);
   color: var(--text-primary);
 }
+
+body::before { content: ""; position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(60rem 40rem at -10% -15%, var(--bg-glow-1), transparent 70%),
+              radial-gradient(50rem 36rem at 110% 105%, var(--bg-glow-2), transparent 70%),
+              var(--bg); }
+
+/* Angka tabel (§5.2): semi-condensed, tabular, wght 500 */
+@utility num-table { font-variant-numeric: tabular-nums; font-stretch: 87.5%; font-weight: 500; }
+
+/* Efek kaca (§5.5) */
+@utility glass { background: var(--bg-panel); border: 1px solid var(--line); }
+@utility glass-strong { background: var(--bg-panel-strong); border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); }
+@media (max-width: 767px) { .glass-strong { -webkit-backdrop-filter: blur(12px) saturate(140%); backdrop-filter: blur(12px) saturate(140%); } }
+@supports not (backdrop-filter: blur(1px)) { .glass, .glass-strong { background: var(--bg-panel-solid); } }
+@media (prefers-reduced-transparency: reduce) { .glass, .glass-strong { background: var(--bg-panel-solid); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* Cahaya ikon logo (§5.5); isi SVG tidak diubah */
+.brand-logo svg { filter: drop-shadow(0 0 10px rgba(145, 121, 214, .45)); }

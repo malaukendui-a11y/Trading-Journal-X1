@@ -21,41 +21,41 @@ export function StatGrid({ stats, t, lang }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {/* 1. Total Trade */}
-      <Card className="p-4 border border-line bg-bg-panel flex flex-col justify-between">
-        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+      <Card className="p-4 flex flex-col justify-between">
+        <p className="text-[13px] font-medium text-text-secondary">
           {t('dashboard.totalTrades')}
         </p>
-        <p className="text-2xl font-bold font-mono text-text-primary mt-2">
+        <p className="text-2xl font-medium tabular-nums text-text-primary mt-2">
           {total}
         </p>
       </Card>
 
       {/* 2. Win Rate */}
-      <Card className="p-4 border border-line bg-bg-panel flex flex-col justify-between">
-        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+      <Card className="p-4 flex flex-col justify-between">
+        <p className="text-[13px] font-medium text-text-secondary">
           {t('dashboard.winRate')}
         </p>
-        <p className="text-2xl font-bold font-mono text-text-primary mt-2">
+        <p className="text-2xl font-medium tabular-nums text-text-primary mt-2">
           {winRate}
         </p>
       </Card>
 
       {/* 3. Revenge Trade */}
-      <Card className="p-4 border border-line bg-bg-panel flex flex-col justify-between">
-        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+      <Card className="p-4 flex flex-col justify-between">
+        <p className="text-[13px] font-medium text-text-secondary">
           {t('dashboard.revengeTrades')}
         </p>
-        <p className="text-2xl font-bold font-mono text-text-primary mt-2">
+        <p className="text-2xl font-medium tabular-nums text-text-primary mt-2">
           {revengeCount}
         </p>
       </Card>
 
       {/* 4. Total P&L */}
-      <Card className="p-4 border border-line bg-bg-panel flex flex-col justify-between">
-        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+      <Card className="p-4 flex flex-col justify-between">
+        <p className="text-[13px] font-medium text-text-secondary">
           {t('dashboard.totalPnl')}
         </p>
-        <p className={`text-2xl font-bold font-mono mt-2 ${pnlColorClass}`}>
+        <p className={`text-2xl font-medium tabular-nums mt-2 ${pnlColorClass}`}>
           {formatCurrency(totalPnl, lang)}
         </p>
       </Card>

@@ -17,7 +17,7 @@ export function AppShell({ children }) {
   } = useUserSettings()
 
   return (
-    <div className="min-h-screen bg-bg text-text-primary flex transition-colors duration-200">
+    <div className="min-h-screen text-text-primary flex transition-colors duration-200">
       {/* Sidebar Nav (Desktop Sticky + Mobile Drawer) */}
       <SidebarNav
         isMobileOpen={isMobileOpen}
@@ -37,7 +37,7 @@ export function AppShell({ children }) {
           displayName={displayName}
         />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
+        <main className="flex-1 p-4 max-w-[1400px] w-full mx-auto">
           <ErrorBoundary>
             {children || <Outlet />}
           </ErrorBoundary>

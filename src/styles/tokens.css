@@ -1,47 +1,112 @@
-:root {
-  --bg: #f7f8fa;
-  --bg-panel: #ffffff;
-  --bg-panel-raised: #f0f1f4;
-  --line: #e3e5e9;
-  --text-primary: #151823;
-  --text-secondary: #6b7280;
+/* src/styles/tokens.css — token warna design.md §5.1 (glass-lite) dan font §5.2.
+   :root = tema terang (default), .dark = tema gelap. Nilai yang sama di kedua tema hanya ditulis di :root. */
 
+:root {
+  --bg: #f4f2fb;
+  --bg-glow-1: rgba(145, 121, 214, .24);
+  --bg-glow-2: rgba(99, 132, 255, .14);
+  --bg-panel: rgba(255, 255, 255, .78);
+  --bg-panel-strong: rgba(255, 255, 255, .72);
+  --bg-panel-solid: #ffffff;
+  --bg-panel-raised: rgba(240, 241, 244, .90);
+  --line: rgba(21, 24, 35, .08);
+  --text-primary: #151823;
+  --text-secondary: #565c6b;
+  --accent: #9179d6;
   --accent-text: #6d55b8;
   --accent-solid: #6d55b8;
+  --accent-soft: rgba(145, 121, 214, .12);
+  --accent-border: rgba(109, 85, 184, .35);
   --sage: #177245;
-  --brick: #c2410c;
+  --brick: #c4271c;
+  --sage-soft: rgba(23, 114, 69, .10);
+  --brick-soft: rgba(196, 39, 28, .10);
+  --sage-border: rgba(23, 114, 69, .30);
+  --brick-border: rgba(196, 39, 28, .30);
+  --on-danger: #ffffff;
+  --scrim: rgba(21, 24, 35, .30);
+  --heat-profit-1: rgba(31, 157, 85, .18);
+  --heat-profit-2: rgba(31, 157, 85, .36);
+  --heat-profit-3: rgba(31, 157, 85, .56);
+  --heat-profit-4: rgba(31, 157, 85, .80);
+  --heat-loss-1: rgba(217, 45, 32, .16);
+  --heat-loss-2: rgba(217, 45, 32, .32);
+  --heat-loss-3: rgba(217, 45, 32, .50);
+  --heat-loss-4: rgba(217, 45, 32, .72);
+  --text-on-heat-strong: #151823;
+  --auth-panel-from: #6d55b8;
+  --auth-panel-to: #4a3a8c;
 }
 
 .dark {
-  --bg: #10151b;
-  --bg-panel: #161d25;
-  --bg-panel-raised: #1c242e;
-  --line: #2a333d;
+  --bg: #0e1119;
+  --bg-glow-1: rgba(145, 121, 214, .32);
+  --bg-glow-2: rgba(76, 111, 214, .22);
+  --bg-panel: rgba(22, 29, 37, .78);
+  --bg-panel-strong: rgba(22, 29, 37, .70);
+  --bg-panel-solid: #161d25;
+  --bg-panel-raised: rgba(28, 36, 46, .90);
+  --line: rgba(255, 255, 255, .08);
   --text-primary: #e9e4d8;
   --text-secondary: #a9a89e;
-
-  --accent-text: #9179d6;
-  --accent-solid: #6d55b8;
-  --sage: #52a878;
+  --accent-text: #a996e3;
+  --accent-soft: rgba(145, 121, 214, .16);
+  --accent-border: rgba(145, 121, 214, .45);
+  --sage: #7fa387;
   --brick: #d9786a;
+  --sage-soft: rgba(127, 163, 135, .08);
+  --brick-soft: rgba(217, 120, 106, .08);
+  --sage-border: rgba(127, 163, 135, .35);
+  --brick-border: rgba(217, 120, 106, .35);
+  --on-danger: #0e1119;
+  --scrim: rgba(5, 7, 12, .62);
+  --heat-profit-1: rgba(127, 163, 135, .25);
+  --heat-profit-2: rgba(127, 163, 135, .45);
+  --heat-profit-3: rgba(127, 163, 135, .55);
+  --heat-profit-4: rgba(127, 163, 135, .90);
+  --heat-loss-1: rgba(217, 120, 106, .25);
+  --heat-loss-2: rgba(217, 120, 106, .45);
+  --heat-loss-3: rgba(217, 120, 106, .55);
+  --heat-loss-4: rgba(217, 120, 106, .90);
+  --text-on-heat-strong: #0e1119;
 }
 
 @theme {
   --color-bg: var(--bg);
+  --color-bg-glow-1: var(--bg-glow-1);
+  --color-bg-glow-2: var(--bg-glow-2);
   --color-bg-panel: var(--bg-panel);
+  --color-bg-panel-strong: var(--bg-panel-strong);
+  --color-bg-panel-solid: var(--bg-panel-solid);
   --color-bg-panel-raised: var(--bg-panel-raised);
   --color-line: var(--line);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
-
-  --color-accent: #9179d6;
-  --color-accent-dim: #5f4f96;
+  --color-accent: var(--accent);
   --color-accent-text: var(--accent-text);
   --color-accent-solid: var(--accent-solid);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
   --color-sage: var(--sage);
   --color-brick: var(--brick);
+  --color-sage-soft: var(--sage-soft);
+  --color-brick-soft: var(--brick-soft);
+  --color-sage-border: var(--sage-border);
+  --color-brick-border: var(--brick-border);
+  --color-on-danger: var(--on-danger);
+  --color-scrim: var(--scrim);
+  --color-heat-profit-1: var(--heat-profit-1);
+  --color-heat-profit-2: var(--heat-profit-2);
+  --color-heat-profit-3: var(--heat-profit-3);
+  --color-heat-profit-4: var(--heat-profit-4);
+  --color-heat-loss-1: var(--heat-loss-1);
+  --color-heat-loss-2: var(--heat-loss-2);
+  --color-heat-loss-3: var(--heat-loss-3);
+  --color-heat-loss-4: var(--heat-loss-4);
+  --color-text-on-heat-strong: var(--text-on-heat-strong);
+  --color-auth-panel-from: var(--auth-panel-from);
+  --color-auth-panel-to: var(--auth-panel-to);
 
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-sans);
 }
