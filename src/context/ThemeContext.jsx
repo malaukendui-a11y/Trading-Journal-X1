@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
 const THEME_STORAGE_KEY = 'tc_theme'
 const ThemeContext = createContext(null)
@@ -32,11 +32,12 @@ export function ThemeProvider({ children }) {
     }
   }, [theme])
 
-  const setTheme = (newTheme) => {
+  // Referensi stabil: dipakai sebagai dependency effect baca user_settings
+  const setTheme = useCallback((newTheme) => {
     if (newTheme === 'dark' || newTheme === 'light') {
       setThemeState(newTheme)
     }
-  }
+  }, [])
 
   const toggleTheme = () => {
     setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'))
